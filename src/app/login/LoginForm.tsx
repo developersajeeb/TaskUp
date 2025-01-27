@@ -23,9 +23,7 @@ const LoginForm: FunctionComponent = () => {
   const [isFormBtnLoading, setIsFormBtnLoading] = useState<boolean>(false);
   const uriParams = qs.parse(useSearchParams().toString());
   const callbackUrl = (uriParams?.callbackUrl as string) ?? '/dashboard';
-  console.log(callbackUrl);
   
-
   const {
     register,
     control,

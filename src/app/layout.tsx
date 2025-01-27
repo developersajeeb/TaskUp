@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "../styles/app.scss";
-import NavBar from "@/components/NavBar";
 import 'primereact/resources/primereact.min.css';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import { ThemeProvider } from "next-themes";
@@ -23,7 +22,6 @@ export default function RootLayout({
       <AuthProvider>
         <body>
           <ThemeProvider attribute="class" defaultTheme='light' >
-            <NavBar />
             <ToastContainer />
             <main>{children}</main>
           </ThemeProvider>
