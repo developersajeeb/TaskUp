@@ -3,38 +3,56 @@ import { ErrorMessage } from '@hookform/error-message';
 import { useRouter } from 'next/navigation';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
-import React, { useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
-const PasswordChangeForm = () => {
+type ForgotPasswordPayload = {
+    email: string;
+    token?: string;
+    password: string;
+    password_confirmation: string;
+};
+
+const PasswordChangeForm: FunctionComponent = () => {
     const router = useRouter();
     const [isFormBtnLoading, setIsFormBtnLoading] = useState<boolean>(false);
-    const { register, handleSubmit, formState: { errors } } = useForm<{ email: string }>();
+    const { register, handleSubmit, formState: { errors } } = useForm<ForgotPasswordPayload>({
+        defaultValues: {
+            email: '',
+        },
+    });
 
-    const onSubmit = async (data: { email: string }) => {
+    // Handle form submission
+    const onSubmit = async (data: ForgotPasswordPayload) => {
         setIsFormBtnLoading(true);
+
         try {
-            const response = await fetch("/api/auth/forgot-password", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
+            const response = await fetch('/api/auth/forgot-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: data.email })
             });
 
             const result = await response.json();
-            if (!response.ok) throw new Error(result.message);
+
+            if (response.ok) {
+                toast.success(result.message || 'Check your email for the reset link!');
+                router.push('/login'); // Redirect to login
+            } else {
+                toast.error(result.message || 'Something went wrong!');
+            }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error) {
+            toast.error('Error occurred while sending email');
+        } finally {
             setIsFormBtnLoading(false);
-            toast.success("Password reset link sent to your email.");
-            router.push("/login");
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (error: any) {
-            alert(error.message || "Something went wrong!");
         }
     };
 
     return (
         <>
-            <h1 className="mb-5 text-center text-lg font-semibold leading-none text-gray-900">Forgot Password</h1>
+            <h1 className="mb-5 text-center text-lg font-semibold leading-none text-gray-900 dark:text-white">Forgot Password</h1>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="input-field mb-4">
                     <label className="mb-1 text-sm text-gray-600 dark:text-gray-50" htmlFor="email">
