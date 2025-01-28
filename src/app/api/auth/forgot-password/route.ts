@@ -1,57 +1,57 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import clientPromise from '@/lib/mongodb';
-import nodemailer from 'nodemailer';
-import crypto from 'crypto';
+import { NextResponse } from "next/server";
+import nodemailer from "nodemailer";
+import crypto from "crypto";
+import clientPromise from "@/lib/mongodb";
 
-const forgotPasswordApi = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method === 'POST') {
-    const { email } = req.body;
-
+export async function POST(req: Request) {
     try {
-      const client = await clientPromise;
-      const db = client.db();
-      const user = await db.collection('users').findOne({ email });
+        const { email } = await req.json();
 
-      if (!user) {
-        return res.status(400).json({ message: 'No user found with this email' });
-      }
+        if (!email) {
+            return NextResponse.json({ error: "Email is required" }, { status: 400 });
+        }
 
-      // Create reset token
-      const resetToken = crypto.randomBytes(32).toString('hex');
-      const resetTokenExpiration = Date.now() + 3600000; // Token valid for 1 hour
+        // Connect to MongoDB
+        const client = await clientPromise;
+        const db = client.db("taskManagement");
+        const usersCollection = db.collection("users");
 
-      // Save token in DB
-      await db.collection('users').updateOne(
-        { email },
-        { $set: { resetToken, resetTokenExpiration } }
-      );
+        // Find user
+        const user = await usersCollection.findOne({ email });
+        if (!user) {
+            return NextResponse.json({ error: "User not found" }, { status: 404 });
+        }
 
-      // Create reset link
-      const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
+        // Generate token
+        const resetToken = crypto.randomBytes(20).toString("hex");
+        const tokenExpiry = new Date(Date.now() + 3600000); // 1-hour expiry
 
-      // Send email
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: 'your-email@gmail.com',
-          pass: 'your-email-password',
-        },
-      });
+        // Update user with reset token and expiry
+        await usersCollection.updateOne(
+            { email },
+            { $set: { resetToken, tokenExpiry } }
+        );
 
-      await transporter.sendMail({
-        to: email,
-        subject: 'Password Reset Request',
-        text: `Please use the following link to reset your password: ${resetLink}`,
-      });
+        // Send email
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASSWORD,
+            },
+        });
 
-      res.status(200).json({ message: 'Email sent. Please check your inbox' });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const resetLink = `http://localhost:3000/new-password?token=${resetToken}`;
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: "Password Reset",
+            html: `<p>Click the link to reset your password: <a href="${resetLink}">${resetLink}</a></p><br><p>Expire in 1 hour!</p>`,
+        });
+
+        return NextResponse.json({ message: "Password reset email sent!" }, { status: 200 });
     } catch (error) {
-      res.status(500).json({ message: 'Error sending email' });
+        console.error("Error in forgot password API:", error);
+        return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
     }
-  } else {
-    res.status(405).json({ message: 'Method Not Allowed' });
-  }
-};
-
-export default forgotPasswordApi;
+}

@@ -7,7 +7,7 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Allow public access to specific routes
-  const publicRoutes = ["/login", "/signup", "/forgot-password"];
+  const publicRoutes = ["/login", "/signup", "/forgot-password", "/new-password"];
   if (publicRoutes.includes(pathname)) {
     if (token) {
       // Redirect authenticated users away from public routes to a protected page

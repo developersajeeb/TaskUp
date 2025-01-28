@@ -26,25 +26,20 @@ const PasswordChangeForm: FunctionComponent = () => {
     // Handle form submission
     const onSubmit = async (data: ForgotPasswordPayload) => {
         setIsFormBtnLoading(true);
-
         try {
-            const response = await fetch('/api/auth/forgot-password', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: data.email })
+            const response = await fetch("/api/auth/forgot-password", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
             });
 
             const result = await response.json();
-
-            if (response.ok) {
-                toast.success(result.message || 'Check your email for the reset link!');
-                router.push('/login'); // Redirect to login
-            } else {
-                toast.error(result.message || 'Something went wrong!');
-            }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (error) {
-            toast.error('Error occurred while sending email');
+            if (!response.ok) throw new Error(result.error || "Something went wrong");
+            toast.success("Password reset link sent to your email!");
+            router.push('/login');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+            toast.error(error.message);
         } finally {
             setIsFormBtnLoading(false);
         }

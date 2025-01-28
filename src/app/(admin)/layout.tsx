@@ -5,10 +5,12 @@ interface Props {
   children: React.ReactNode;
 }
 
-export default async function Layout({ children }: Props) {
+function Layout({ children }: Props) {
   return (
     <section className="main-area">
       <AdminLayout>{children}</AdminLayout>
     </section>
   );
 }
+
+export default Layout;

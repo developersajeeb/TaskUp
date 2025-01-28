@@ -3,7 +3,6 @@ import "./globals.css";
 import "../styles/app.scss";
 import 'primereact/resources/primereact.min.css';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
-import { ThemeProvider } from "next-themes";
 import AuthProvider from "@/halper/AuthProvider";
 import { ToastContainer } from "react-toastify";
 
@@ -19,14 +18,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <AuthProvider>
-        <body>
-          <ThemeProvider attribute="class" defaultTheme='light' >
+      <body>
+        <AuthProvider>
             <ToastContainer />
             <main>{children}</main>
-          </ThemeProvider>
-        </body>
-      </AuthProvider>
+        </AuthProvider>
+      </body>
     </html >
   );
 }
