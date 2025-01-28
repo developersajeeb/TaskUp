@@ -17,12 +17,14 @@ const DeskTopSidebar = () => {
                 <Image className={`w-[130px] md:w-[160px] mx-auto`} src={Logo} alt='Logo' width={180} height={80} />
             </Link>
 
-            <ul className='text-gray-700 dark:text-white text-sm font-medium mt-12 flex flex-col gap-3'>
-                <li><Link className={`flex items-center gap-2 ${pathname === '/dashboard' ? 'text-[#9C83F2]' : ''}`} href='/dashboard'><RxDashboard size={20} /> Dashboard</Link></li>
-                <li><Link className={`flex items-center gap-2 ${pathname === '/task' ? 'text-[#9C83F2]' : ''}`} href='/task'><GoTasklist size={20} /> Tasks</Link></li>
-                <li><Link className={`flex items-center gap-2 ${pathname === '/in-progress-task' ? 'text-[#9C83F2]' : ''}`} href='/in-progress-task'><RiProgress2Line size={20} /> In Progress Tasks</Link></li>
-                <li><Link className={`flex items-center gap-2 ${pathname === '/completed-task' ? 'text-[#9C83F2]' : ''}`} href='/completed-task'><CgGoogleTasks size={20} /> Completed Tasks</Link></li>
-            </ul>
+            <div className='h-[calc(100%-170px)] flex items-center justify-center'>
+                <ul className='text-gray-700 dark:text-white text-sm font-medium mt-12 grid gap-5'>
+                    <li><Link className={`flex items-center gap-2 ${pathname === '/dashboard' ? 'text-[#9C83F2]' : ''}`} href='/dashboard'><RxDashboard size={20} /> Dashboard</Link></li>
+                    <li><Link className={`flex items-center gap-2 ${pathname === '/task' ? 'text-[#9C83F2]' : ''}`} href='/task'><GoTasklist size={20} /> Tasks</Link></li>
+                    <li><Link className={`flex items-center gap-2 ${pathname === '/in-progress-task' ? 'text-[#9C83F2]' : ''}`} href='/in-progress-task'><RiProgress2Line size={20} /> In Progress Tasks</Link></li>
+                    <li><Link className={`flex items-center gap-2 ${pathname === '/completed-task' ? 'text-[#9C83F2]' : ''}`} href='/completed-task'><CgGoogleTasks size={20} /> Completed Tasks</Link></li>
+                </ul>
+            </div>
         </aside>
     );
 };
