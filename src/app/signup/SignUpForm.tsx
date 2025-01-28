@@ -49,17 +49,20 @@ const SignUpForm = () => {
             });
     
             const result = await response.json();
-            if (!response.ok) {
-                throw new Error(result.message || "Registration failed");
+            if (response.ok) {
+                toast.success("Registration successful!");
+                router.push('/dashboard');
+            } else {
+                toast.error(result.message || "Registration failed");
             }
-            toast.success("User registered successfully!");
-            router.push('/dashboard');
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error(error.message);
             toast.error(error.message || "Something went wrong!");
         }
     };
+
+    
     
 
     return (

@@ -53,12 +53,13 @@ const LoginForm: FunctionComponent = () => {
         email: formData.email,
         password: formData.password,
         redirect: false,
+        callbackUrl,
       });
 
       if (!res?.error) {
         resetForm();
         toast.success("User logged in successfully!");
-        router.push(callbackUrl);
+        router.push(res?.url || callbackUrl);
       } else {
         const error = JSON.parse(res?.error);
         Object.keys(error?.errors ?? {}).forEach((key) => {
