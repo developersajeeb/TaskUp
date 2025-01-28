@@ -88,7 +88,7 @@ const LoginForm: FunctionComponent = () => {
       <form onSubmit={handleSubmit(handleLogin)} className="pt-5">
         <div className="mb-5">
           <label className="mb-1 text-sm text-gray-900 dark:text-gray-50" htmlFor="email">
-            Email
+            Email<span className='text-red-500'>*</span>
           </label>
           <InputText
             className="tu-input"
@@ -107,7 +107,7 @@ const LoginForm: FunctionComponent = () => {
         </div>
         <div className="mb-4">
           <label className="mb-1 flex items-center justify-between text-sm text-gray-900 dark:text-gray-50" htmlFor="password">
-            Password
+            <p>Password<span className='text-red-500'>*</span></p>
             <Link href={'forgot-password'} className="text-sm text-blue-500 duration-300 hover:text-blue-700">
               Forgot Password?
             </Link>
