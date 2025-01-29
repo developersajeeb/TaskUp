@@ -6,7 +6,8 @@ import { OverlayPanel } from 'primereact/overlaypanel';
 import { Button } from 'primereact/button';
 import Link from 'next/link';
 import Image from 'next/image';
-import Logo from '../../public/images/logo.png';
+import Logo from '../../public/images/logo-icon.png';
+import { CgMenuLeft } from 'react-icons/cg';
 
 const NavBar = () => {
     const session = useSession();
@@ -22,9 +23,12 @@ const NavBar = () => {
     return (
         <nav className='fixed left-0 right-0 top-0 z-40 w-full lg:pl-[240px] h-[80px]'>
             <div className='container flex justify-between lg:justify-end gap-5 items-center py-4'>
-                <Link href='/' className='lg:hidden'>
-                    <Image className={`w-[130px] md:w-[160px]`} src={Logo} alt='Logo' width={180} height={80} />
-                </Link>
+                <div className='flex items-center gap-5 lg:hidden'>
+                    <Link href='/'>
+                        <Image src={Logo} alt='Logo' width={40} height={40} />
+                    </Link>
+                    <span><CgMenuLeft size={24} /></span>
+                </div>
                 {session.status === "authenticated" && (
                     <div className='flex gap-3 md:gap-5 items-center'>
                         <ThemeSwitch />
