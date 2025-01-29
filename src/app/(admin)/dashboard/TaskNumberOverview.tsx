@@ -11,7 +11,7 @@ const TaskNumberOverview = () => {
     const session = useSession();
 
     return (
-        <div className='bg-gray-50 dark:bg-[#1f1f1f] text-gray-900 dark:text-white px-8 pt-8 rounded-2xl grid grid-cols-2 gap-4 justify-between align-bottom'>
+        <div className='bg-gray-50 dark:bg-[#1f1f1f] text-gray-900 dark:text-white px-8 pt-8 rounded-2xl grid grid-cols-2 gap-4 justify-between items-end'>
             <div className='pb-8'>
                 <h1 className='text-2xl font-medium'>Welcome, {session?.data?.user?.name}</h1>
                 <p className='mt-1 text-sm'>All tasks overview</p>

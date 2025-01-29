@@ -1,15 +1,23 @@
 'use client';
 import { SessionProvider } from 'next-auth/react';
-import { ThemeProvider } from 'next-themes';
+import dynamic from 'next/dynamic';
 import React, { ReactNode } from 'react';
+
+const ThemeProvider = dynamic(
+    () => import('next-themes').then((mod) => mod.ThemeProvider),
+    {
+        ssr: false,
+    }
+);
 
 interface Props {
     children: ReactNode;
 }
 
 const AuthProvider = ({ children }: Props) => {
+
     return (
-        <ThemeProvider attribute="class" defaultTheme='light' >
+        <ThemeProvider enableSystem={true} attribute="class" defaultTheme="dark">
             <SessionProvider>{children}</SessionProvider>
         </ThemeProvider>
     );
