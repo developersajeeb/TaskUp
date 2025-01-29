@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 
 type ResetPasswordPayload = {
     password: string;
-    password_confirmation: string;
+    confirm_password: string;
 };
 
 const PasswordResetForm: FunctionComponent = () => {
@@ -33,33 +33,35 @@ const PasswordResetForm: FunctionComponent = () => {
         if (tokenFromUrl) {
             setToken(tokenFromUrl);
         }
-    }, [searchParams]);
+    }, [searchParams]);    
 
     const onSubmit = async (data: { password: string }) => {
+        console.log(data);
+        
         setIsFormBtnLoading(true);
         try {
-            if (!token) {
-                throw new Error("Token is missing or invalid");
-            }
-    
-            const response = await fetch("/api/auth/new-password", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ password: data.password, token }), // Ensure token is passed
-            });
-    
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.error || "Something went wrong");
-    
-            toast.success("Password changed successfully!");
-            router.push("/login");
+          if (!token || !data.password) {
+            throw new Error("Token or password is missing or invalid");
+          }
+      
+          const response = await fetch("/api/pages/new-pass", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ password: data.password, token: token }), // Ensure token is passed
+          });
+      
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || "Something went wrong");
+      
+          toast.success("Password changed successfully!");
+          router.push("/login");
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
-            toast.error(error.message || "Failed to reset password");
+          toast.error(error.message || "Failed to reset password");
         } finally {
-            setIsFormBtnLoading(false);
+          setIsFormBtnLoading(false);
         }
-    };    
+    };   
 
     return (
         <>
@@ -102,12 +104,12 @@ const PasswordResetForm: FunctionComponent = () => {
                 </div>
 
                 {/* Confirm Password Field */}
-                <div>
+                {/* <div>
                     <label className="mb-2 text-sm text-gray-600 dark:text-gray-50" htmlFor="confirm_password">
                         Confirm Password<span className="text-red-500">*</span>
                     </label>
                     <Controller
-                        name="password_confirmation"
+                        name="confirm_password"
                         control={control}
                         render={({ field: { onChange, value } }) => (
                             <Password className="tu-password-input" value={value} onChange={onChange} toggleMask feedback={false} />
@@ -119,8 +121,8 @@ const PasswordResetForm: FunctionComponent = () => {
                             validate: (value, formValues) => (value === formValues.password ? true : 'Passwords do not match'),
                         }}
                     />
-                    <ErrorMessage errors={errors} name="password_confirmation" render={({ message }) => <span className="text-sm text-red-500">{message}</span>} />
-                </div>
+                    <ErrorMessage errors={errors} name="confirm_password" render={({ message }) => <span className="text-sm text-red-500">{message}</span>} />
+                </div> */}
 
                 {/* Submit Button */}
                 <Button type="submit" label="Submit" className="primary-btn w-full mt-6" disabled={isFormBtnLoading} loading={isFormBtnLoading} />

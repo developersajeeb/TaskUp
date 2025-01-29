@@ -3,10 +3,10 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 
 export async function POST(req: Request) {
+  console.log('SAJEEEEEEEEEEB');
   try {
     const { password, token } = await req.json();
-
-    console.log("Received Payload:", { password, token });
+    
 
     if (!token || !password) {
       return NextResponse.json(
