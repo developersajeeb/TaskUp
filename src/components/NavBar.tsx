@@ -20,9 +20,9 @@ const NavBar = () => {
     };
 
     return (
-        <nav className='fixed left-0 right-0 top-0 z-40 w-full lg:pl-[220px] h-[80px]'>
-            <div className='container flex justify-between md:justify-end gap-5 items-center py-4'>
-                <Link href='/' className='md:hidden'>
+        <nav className='fixed left-0 right-0 top-0 z-40 w-full lg:pl-[240px] h-[80px]'>
+            <div className='container flex justify-between lg:justify-end gap-5 items-center py-4'>
+                <Link href='/' className='lg:hidden'>
                     <Image className={`w-[130px] md:w-[160px]`} src={Logo} alt='Logo' width={180} height={80} />
                 </Link>
                 {session.status === "authenticated" && (
