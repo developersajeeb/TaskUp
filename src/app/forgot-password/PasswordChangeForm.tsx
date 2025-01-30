@@ -27,7 +27,7 @@ const PasswordChangeForm: FunctionComponent = () => {
     const onSubmit = async (data: ForgotPasswordPayload) => {
         setIsFormBtnLoading(true);
         try {
-            const response = await fetch("/api/pages/forgot-pass", {
+            const response = await fetch("/api/forgot-pass", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),

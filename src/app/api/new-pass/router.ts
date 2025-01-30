@@ -1,10 +1,10 @@
-import clientPromise from "@/lib/mongodb";
 import { NextResponse } from "next/server";
+import clientPromise from "@/lib/mongodb";
 import bcrypt from "bcrypt";
 
 export async function POST(req: Request) {
-  console.log('SAJEEEEEEEEEEB');
   try {
+    console.log(req);
     const { password, token } = await req.json();
     
 

@@ -3,7 +3,7 @@ import { ErrorMessage } from '@hookform/error-message';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from 'primereact/button';
 import { Password } from 'primereact/password';
-import React, { FunctionComponent, useEffect, useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
@@ -12,11 +12,14 @@ type ResetPasswordPayload = {
     confirm_password: string;
 };
 
-const PasswordResetForm: FunctionComponent = () => {
+interface Props {
+    token?: string
+}
+
+const PasswordResetForm: FunctionComponent<Props> = ({token}) => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isFormBtnLoading, setIsFormBtnLoading] = useState(false);
-    const [token, setToken] = useState<string | null>(null);
 
     const {
         control,
@@ -26,28 +29,20 @@ const PasswordResetForm: FunctionComponent = () => {
         defaultValues: {
             password: '',
         },
-    });
-
-    useEffect(() => {
-        const tokenFromUrl = searchParams.get('token');
-        if (tokenFromUrl) {
-            setToken(tokenFromUrl);
-        }
-    }, [searchParams]);    
+    });  
 
     const onSubmit = async (data: { password: string }) => {
-        console.log(data);
-        
+            
         setIsFormBtnLoading(true);
         try {
           if (!token || !data.password) {
             throw new Error("Token or password is missing or invalid");
           }
       
-          const response = await fetch("/api/pages/new-pass", {
+          const response = await fetch("/api/new-pass", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ password: data.password, token: token }), // Ensure token is passed
+            body: JSON.stringify({ password: data.password, token }),
           });
       
           const result = await response.json();

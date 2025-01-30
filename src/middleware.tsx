@@ -8,9 +8,8 @@ export async function middleware(req: NextRequest) {
 
   // Allow public access to specific routes
   const publicRoutes = ["/login", "/signup", "/forgot-password", "/new-password"];
-  if (publicRoutes.includes(pathname)) {
+  if (publicRoutes.some(route => pathname.startsWith(route))) {
     if (token) {
-      // Redirect authenticated users away from public routes to a protected page
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
     return NextResponse.next();
@@ -28,7 +27,6 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Allow access to other routes for authenticated users
   return NextResponse.next();
 }
 
