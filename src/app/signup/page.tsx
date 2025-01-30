@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 import ThemeSwitch from '@/components/ThemeSwitch';
 
 export const metadata: Metadata = {
-    title: "Sign Up - Personal Project Management",
+    title: "Sign Up - TaskUp",
   };
 
 const SignUp = () => {

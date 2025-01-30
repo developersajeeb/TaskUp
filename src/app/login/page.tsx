@@ -2,6 +2,11 @@ import React from 'react';
 import LoginForm from './LoginForm';
 import ThemeSwitch from '@/components/ThemeSwitch';
 import Link from 'next/link';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: "Login - TaskUp",
+  };
 
 const Login = () => {
 

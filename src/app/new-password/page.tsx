@@ -1,6 +1,11 @@
 import Link from 'next/link';
 import React from 'react';
 import PasswordResetForm from './PasswordResetForm';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: "New Password - TaskUp",
+  };
 
 const ResetPassword = () => {
     return (

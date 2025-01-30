@@ -7,8 +7,8 @@ import AuthProvider from "@/halper/AuthProvider";
 import { ToastContainer } from "react-toastify";
 
 export const metadata: Metadata = {
-  title: "Personal Project Management",
-  description: "Manage your personal project for complete the goal.",
+  title: "TaskUp",
+  description: "Your personal project management",
 };
 
 export default function RootLayout({
