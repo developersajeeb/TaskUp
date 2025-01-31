@@ -41,7 +41,7 @@ export async function POST(req: Request) {
             },
         });
 
-        const resetLink = `http://localhost:3000/new-password?token=${resetToken}`;
+        const resetLink = `http://localhost:3000/new-password/${resetToken}/`;
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: email,
