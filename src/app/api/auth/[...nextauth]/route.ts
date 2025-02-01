@@ -40,7 +40,6 @@ const handler = NextAuth({
 
     callbacks: {
         async redirect({ url, baseUrl }) {
-            console.log("Redirecting to:", url);
             return url.startsWith(baseUrl) ? url : baseUrl + "/dashboard";
         },
     },
