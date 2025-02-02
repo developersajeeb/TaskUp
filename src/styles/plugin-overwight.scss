@@ -1,0 +1,68 @@
+.p-dialog-content {
+    @apply bg-white dark:bg-[#171717];
+}
+
+.p-dialog-header {
+    @apply py-[14px] bg-gray-50 dark:bg-[#19181a];
+    
+    .p-dialog-title {
+        @apply dark:text-white font-medium text-lg;
+    }
+    
+    .p-dialog-header-close {
+        @apply dark:text-gray-200;
+    }
+}
+
+.p-multiselect-header {
+    @apply dark:!bg-[#2c2c2c];
+
+    .p-icon {
+        @apply dark:text-white;
+    }
+}
+
+.p-multiselect-items-wrapper {
+    @apply dark:!bg-[#2c2c2c];
+}
+
+.p-multiselect-panel .p-multiselect-items {
+    .p-multiselect-item{
+        @apply dark:text-white;
+
+        &:not(.p-highlight):not(.p-disabled):hover {
+            @apply dark:!bg-[#434242];
+        }
+        &:not(.p-highlight):not(.p-disabled).p-focus {
+            @apply dark:!bg-[#434242];
+        }
+        &:focus {
+            box-shadow: none !important;
+        }
+        &.p-highlight {
+            @apply bg-gray-100 dark:!bg-[#2c2c2c];
+        }
+    }
+}
+
+.p-checkbox {
+    &:not(.p-disabled):has(.p-checkbox-input:hover).p-highlight .p-checkbox-box {
+        @apply dark:bg-[#545454]
+    }
+
+    .p-checkbox-box {
+        @apply border;
+    }
+}
+
+.p-multiselect-filter {
+    @apply block w-full outline-none font-medium text-sm bg-gray-50 dark:bg-[#3f3f3f] rounded-md h-10 px-3 border border-gray-200 dark:border-gray-700 focus:shadow-none focus:border-violet-600 focus:ring-0 text-gray-700 dark:text-white;
+
+    &:active {
+        @apply text-gray-500;
+    }
+
+    &:hover {
+        @apply border-violet-600;
+    }
+}

@@ -6,3 +6,7 @@
 * {
   font-family: "Inter", serif;
 }
+
+body {
+  @apply bg-white dark:bg-[#121212];
+}
