@@ -1,15 +1,45 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from "@/lib/mongodb";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const client = await clientPromise;
     const db = client.db("taskManagement");
 
-    const tasks = await db.collection("tasks").find({}).toArray();
-    return NextResponse.json({ status: 200, data: tasks });
-  } catch (error) {
+    const { searchParams } = new URL(req.url);
+    const userEmail = searchParams.get("userEmail");
+
+    const query = userEmail ? { userEmail } : {};
+
+    const tasks = await db.collection("tasks").find(query).toArray();
+    
+    return NextResponse.json({ success: true, data: tasks });
+  } catch (error: any) {
     console.error('Error fetching tasks:', error);
-    return NextResponse.json({ status: 500, message: 'Internal Server Error' });
+    return NextResponse.json(
+      { success: false, message: error.message || 'Internal Server Error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    const { taskName, description, dueDate, taskCategory, userEmail } = await req.json();
+    
+    if (!taskName || !taskCategory) {
+      return NextResponse.json({ success: false, message: 'Task name and category are required' }, { status: 400 });
+    }
+
+    const client = await clientPromise;
+    const db = client.db("taskManagement");
+    
+    const newTask = { taskName, description, dueDate, taskCategory, createdAt: new Date(), userEmail };
+    const result = await db.collection("tasks").insertOne(newTask);
+
+    return NextResponse.json({ success: true, message: 'Task added successfully', taskId: result.insertedId });
+  } catch (error: any) {
+    console.error('Error adding task:', error);
+    return NextResponse.json({ success: false, message: error.message || 'Failed to add task' }, { status: 500 });
   }
 }
