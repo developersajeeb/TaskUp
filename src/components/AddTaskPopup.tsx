@@ -111,7 +111,7 @@ const AddTaskPopup = ({ taskAddForm, setTaskAddForm }: Props) => {
     };
 
     return (
-        <Dialog header="Add new task" visible={taskAddForm} style={{ width: '30vw' }} onHide={() => setTaskAddForm(false)}>
+        <Dialog header="Add new task" visible={taskAddForm} className='w-full max-w-[480px]' onHide={() => setTaskAddForm(false)}>
             <form className='grid gap-4 pt-5' onSubmit={handleSubmit(onSubmit)}>
                 <div>
                     <label className="mb-1 text-sm text-gray-900 dark:text-gray-50" htmlFor="taskName">
@@ -137,7 +137,7 @@ const AddTaskPopup = ({ taskAddForm, setTaskAddForm }: Props) => {
 
                 <div>
                     <label className="mb-1 text-sm text-gray-900 dark:text-gray-50 flex gap-3 justify-between" htmlFor="taskCategory">
-                        <p>Category<span className='text-red-500'>*</span></p>
+                        <p>Category</p>
                         <span className='text-blue-500 cursor-pointer' onClick={() => setVisibleCtgPopup(true)}>Add New +</span>
                     </label>
                     <MultiSelect

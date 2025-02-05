@@ -67,7 +67,7 @@ const AddCategory = ({ visibleCtgPopup, setVisibleCtgPopup, onCategoryAdded }: P
     };
 
     return (
-        <Dialog header="Add Category" visible={visibleCtgPopup} style={{ width: '25vw' }} onHide={() => { if (!visibleCtgPopup) return; setVisibleCtgPopup(false); }}>
+        <Dialog header="Add Category" visible={visibleCtgPopup} className='w-full max-w-[440px]' onHide={() => { if (!visibleCtgPopup) return; setVisibleCtgPopup(false); }}>
             <form onSubmit={handleSubmit(onSubmit)} className='mt-5'>
                 <div className='flex gap-3'>
                     <InputText
