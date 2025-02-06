@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from "@/lib/mongodb";
 
+// Get Data by specific user
 export async function GET(req: NextRequest) {
   try {
     const client = await clientPromise;
@@ -23,6 +24,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
+// Post task
 export async function POST(req: Request) {
   try {
     const { taskName, description, dueDate, taskCategory, userEmail } = await req.json();
