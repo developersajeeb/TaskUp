@@ -66,8 +66,8 @@ const TaskCards = () => {
                                     <div className='bg-[#dbe8f5] dark:bg-[#36516c] p-5 rounded-xl border-2 border-[#cfe2f5] dark:border-[#486480]'>
                                         <div className='flex gap-2 justify-between'>
                                             <div className='flex gap-2'>
-                                                <span className='flex h-9 w-[100%] max-w-[36px] items-center justify-center rounded-full bg-[#004B94] dark:bg-[#233e77] text-white'><TbSubtask size={20} /></span>
-                                                <h5 className='text-lg font-medium text-gray-800 dark:text-white cursor-pointer'>{tasks?.taskName}</h5>
+                                                <span className='flex h-9 w-[36px] max-w-[36px] items-center justify-center rounded-full bg-[#004B94] dark:bg-[#233e77] text-white'><TbSubtask size={20} /></span>
+                                                <h5 className='text-lg font-medium text-gray-800 dark:text-white cursor-pointer mt-1'>{tasks?.taskName}</h5>
                                             </div>
                                             <div><span className='cursor-pointer' onClick={(e) => editDeletePanel.current?.toggle(e)}><BsThreeDots size={22} /></span></div>
                                         </div>
@@ -100,7 +100,7 @@ const TaskCards = () => {
                 </section>
             </BlockUI>
 
-            <AddTaskPopup taskAddForm={taskAddForm} setTaskAddForm={setTaskAddForm} />
+            <AddTaskPopup taskAddForm={taskAddForm} setTaskAddForm={setTaskAddForm} fetchTasks={fetchTasks} />
         </>
     );
 };

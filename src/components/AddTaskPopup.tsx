@@ -27,9 +27,10 @@ interface TaskCategory {
 interface Props {
     taskAddForm: boolean;
     setTaskAddForm: (value: boolean) => void;
+    fetchTasks: () => void;
 }
 
-const AddTaskPopup = ({ taskAddForm, setTaskAddForm }: Props) => {
+const AddTaskPopup = ({ taskAddForm, setTaskAddForm, fetchTasks }: Props) => {
     const [isFormBtnLoading, setIsFormBtnLoading] = useState<boolean>(false);
     const [selectedCategories, setSelectedCategories] = useState<TaskCategory[]>([]);
     const [visibleCtgPopup, setVisibleCtgPopup] = useState<boolean>(false);
@@ -99,6 +100,8 @@ const AddTaskPopup = ({ taskAddForm, setTaskAddForm }: Props) => {
                 toast.success("Task added successfully!");
                 reset();
                 setTaskAddForm(false);
+                setSelectedCategories([]);
+                fetchTasks();
             } else {
                 toast.error(data.message || "Something went wrong!");
             }
