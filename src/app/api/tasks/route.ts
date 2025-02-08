@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
 
     const query = userEmail ? { userEmail } : {};
 
-    const tasks = await db.collection("tasks").find(query).toArray();
+    const tasks = await db.collection("tasks").find(query).sort({ _id: -1 }).toArray();
     
     return NextResponse.json({ success: true, data: tasks });
   } catch (error: any) {

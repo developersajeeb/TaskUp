@@ -29,7 +29,7 @@ interface Props {
     fetchTasks: () => void;
 }
 
-const AddTaskPopup = ({ taskAddForm, setTaskAddForm, fetchTasks }: Props) => {
+const EditTaskPopup = ({ taskAddForm, setTaskAddForm, fetchTasks }: Props) => {
     const [isFormBtnLoading, setIsFormBtnLoading] = useState<boolean>(false);
     const [selectedCategories, setSelectedCategories] = useState<TaskCategory[]>([]);
     const [visibleCtgPopup, setVisibleCtgPopup] = useState<boolean>(false);
@@ -163,4 +163,4 @@ const AddTaskPopup = ({ taskAddForm, setTaskAddForm, fetchTasks }: Props) => {
     );
 };
 
-export default AddTaskPopup;
+export default EditTaskPopup;
