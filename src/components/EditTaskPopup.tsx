@@ -11,6 +11,7 @@ import { useForm } from 'react-hook-form';
 import AddCategory from './AddCategory';
 import { useSession } from 'next-auth/react';
 import { toast } from 'react-toastify';
+import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 
 interface TaskForm {
     taskName: string;
@@ -30,6 +31,10 @@ interface Props {
     task: any;
 }
 
+interface TaskPriority {
+    name: string;
+}
+
 const EditTaskPopup = ({ taskEditForm, setTaskEditForm, fetchTasks, task }: Props) => {
     const [isFormBtnLoading, setIsFormBtnLoading] = useState<boolean>(false);
     const [selectedCategories, setSelectedCategories] = useState<TaskCategory[]>([]);
@@ -37,7 +42,13 @@ const EditTaskPopup = ({ taskEditForm, setTaskEditForm, fetchTasks, task }: Prop
     const [taskCategories, setTaskCategories] = useState<TaskCategory[]>([]);
     const sessionData = useSession();
     const userEmail = sessionData?.data?.user?.email;
-    
+    const [taskPriority, setTaskPriority] = useState<TaskPriority | null>(null);
+    const allPriority: TaskPriority[] = [
+        { name: 'Low' },
+        { name: 'Medium' },
+        { name: 'High' }
+    ];
+
     const {
         register,
         handleSubmit,
@@ -90,8 +101,6 @@ const EditTaskPopup = ({ taskEditForm, setTaskEditForm, fetchTasks, task }: Prop
     };
 
     const onSubmit = async (formData: TaskForm) => {
-        console.log(task._id);
-        
         setIsFormBtnLoading(true);
         try {
             const formattedCategories = selectedCategories.map(category => category.taskCategory);
@@ -101,6 +110,7 @@ const EditTaskPopup = ({ taskEditForm, setTaskEditForm, fetchTasks, task }: Prop
                 body: JSON.stringify({
                     ...formData,
                     dueDate: formData.dueDate ? formData.dueDate.toISOString() : null,
+                    priority: taskPriority?.name,
                     taskCategory: formattedCategories,
                     userEmail,
                 }),
@@ -111,6 +121,7 @@ const EditTaskPopup = ({ taskEditForm, setTaskEditForm, fetchTasks, task }: Prop
                 toast.success("Task updated successfully!");
                 reset();
                 setTaskEditForm(false);
+                setTaskPriority(null);
                 setSelectedCategories([]);
                 fetchTasks();
             } else {
@@ -125,7 +136,7 @@ const EditTaskPopup = ({ taskEditForm, setTaskEditForm, fetchTasks, task }: Prop
     };
 
     return (
-        <Dialog header="Edit Task" visible={taskEditForm} className='w-full max-w-[480px]' onHide={() => setTaskEditForm(false)}>
+        <Dialog header="Edit Task" visible={taskEditForm} className='w-full max-w-[550px]' onHide={() => setTaskEditForm(false)}>
             <form className='grid gap-4 pt-5' onSubmit={handleSubmit(onSubmit)}>
                 <div>
                     <label className="mb-1 text-sm text-gray-900 dark:text-gray-50" htmlFor="taskName">
@@ -140,13 +151,6 @@ const EditTaskPopup = ({ taskEditForm, setTaskEditForm, fetchTasks, task }: Prop
                         Description
                     </label>
                     <InputTextarea className="tu-input py-3 !h-32" {...register('description')} />
-                </div>
-
-                <div>
-                    <label className="mb-1 text-sm text-gray-900 dark:text-gray-50" htmlFor="dueDate">
-                        Due Date
-                    </label>
-                    <Calendar className='tu-calender' value={watch('dueDate') ?? null} onChange={(e) => setValue('dueDate', e.value as Date)} />
                 </div>
 
                 <div className='overflow-hidden'>
@@ -165,6 +169,22 @@ const EditTaskPopup = ({ taskEditForm, setTaskEditForm, fetchTasks, task }: Prop
                         className="w-full tu-multi-select"
                     />
                     <ErrorMessage errors={errors} name="taskCategory" render={({ message }) => <span className="text-sm text-red-500">{message}</span>} />
+                </div>
+
+                <div className='grid sm:grid-cols-2 gap-5'>
+                    <div>
+                        <label className="mb-1 text-sm text-gray-900 dark:text-gray-50" htmlFor="dueDate">
+                            Due Date
+                        </label>
+                        <Calendar className='tu-calender' value={watch('dueDate') ?? null} onChange={(e) => setValue('dueDate', e.value as Date)} />
+                    </div>
+                    <div>
+                        <label className="mb-1 text-sm text-gray-900 dark:text-gray-50" htmlFor="taskPriority">
+                            Priority
+                        </label>
+                        <Dropdown value={taskPriority ?? allPriority.find(p => p.name === task?.priority)} onChange={(e: DropdownChangeEvent) => setTaskPriority(e.value)} options={allPriority} optionLabel="name"
+                            placeholder="Select a City" className="w-full tu-dropdown-input" />
+                    </div>
                 </div>
 
                 <Button label="Update" type="submit" className="primary-btn mt-3 w-full max-w-36 mx-auto" disabled={isFormBtnLoading} loading={isFormBtnLoading} />

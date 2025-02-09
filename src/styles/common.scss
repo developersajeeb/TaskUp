@@ -93,15 +93,19 @@
 
 }
 
-.tu-selectbox-input {
-    @apply w-full shadow-none outline-none bg-transparent;
-
-    .p-inputtext {
-        @apply pb-0 pt-2;
-    }
+.tu-dropdown-input {
+    @apply w-full h-10 outline-none bg-gray-50 dark:bg-[#303030] rounded-md  border border-gray-200 dark:border-gray-700 focus:shadow-none focus:border-violet-600 focus:ring-0 hover:border-violet-600 dark:hover:border-violet-600;
 
     &:hover {
         @apply outline-none;
+    }
+
+    &:not(.p-disabled).p-focus {
+        @apply shadow-none;
+    }
+
+    .p-inputtext {
+        @apply pb-0 pt-2 text-sm text-gray-700 dark:text-white;
     }
 }
 

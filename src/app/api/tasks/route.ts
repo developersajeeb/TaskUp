@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
 // Post task
 export async function POST(req: Request) {
   try {
-    const { taskName, description, dueDate, taskCategory, userEmail } = await req.json();
+    const { taskName, description, dueDate, priority, taskCategory, userEmail } = await req.json();
     
     if (!taskName || !taskCategory) {
       return NextResponse.json({ success: false, message: 'Task name and category are required' }, { status: 400 });
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
     const client = await clientPromise;
     const db = client.db("taskManagement");
     
-    const newTask = { taskName, description, dueDate, taskCategory, createdAt: new Date(), userEmail };
+    const newTask = { taskName, description, dueDate, priority, taskCategory, createdAt: new Date(), userEmail };
     const result = await db.collection("tasks").insertOne(newTask);
 
     return NextResponse.json({ success: true, message: 'Task added successfully', taskId: result.insertedId });

@@ -16,19 +16,22 @@ import { toast } from 'react-toastify';
 import NoTask from '../../../../public/images/no-task.png';
 import Image from 'next/image';
 import EditTaskPopup from '@/components/EditTaskPopup';
+import TaskDetails from '@/components/TaskDetails';
 
 const TaskCards = () => {
     const [taskAddForm, setTaskAddForm] = useState<boolean>(false);
+    const [taskDetailsPopup, setTaskDetailsPopup] = useState<boolean>(false);
     const { data } = useSession();
     const [allTasks, setAllTasks] = useState<{ data: any[] } | null>(null);
     const userEmail = data?.user?.email;
     const [isDataLoading, setDataLoading] = useState<boolean>(true);
     const [activeOverlay, setActiveOverlay] = useState<string | null>(null);
     const [isDeleteIconLoading, setDeleteIconLoading] = useState<boolean>(false);
+    const [taskIdForDetails, setTaskIdForDetails] = useState<string | null>(null);
     const [taskEditForm, setTaskEditForm] = useState<{ isOpen: boolean; task: any }>({
         isOpen: false,
         task: null,
-    });
+    });    
 
     const fetchTasks = async () => {
         setDataLoading(true);
@@ -125,7 +128,10 @@ const TaskCards = () => {
                     <section className="grid md:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-7 mt-10">
                         {allTasks?.data?.map((tasks: any) => {
                             return (
-                                <div key={tasks._id} className={`bg-[#dbe8f5] dark:bg-[#36516c] p-5 rounded-xl border-2 border-[#cfe2f5] dark:border-[#486480] relative`}>
+                                <div key={tasks._id} className={`bg-[#dbe8f5] dark:bg-[#36516c] p-5 rounded-xl border-2 border-[#cfe2f5] dark:border-[#486480] relative overflow-hidden`}>
+                                    {tasks?.priority !== null &&
+                                        <div className={`absolute transform -rotate-45 text-center text-white font-medium text-[10px] py-1 left-[-30px] top-[8px] w-[100px] shadow-md shadow-[#46464624] ${tasks?.priority === 'Low' && 'bg-gray-400' || tasks?.priority === 'Medium' && 'bg-yellow-500' || tasks?.priority === 'High' && 'bg-red-500'}`}>{tasks?.priority}</div>
+                                    }
                                     <div className="flex gap-2 justify-between">
                                         <div className="flex gap-2">
                                             <span className="flex h-9 w-[36px] max-w-[36px] items-center justify-center rounded-full bg-[#004B94] dark:bg-[#233e77] text-white">
@@ -155,7 +161,7 @@ const TaskCards = () => {
                                         <ProgressBar className="text-xs bg-white dark:bg-gray-200 h-3" value={50}></ProgressBar>
                                     </div>
 
-                                    <div className="flex flex-wrap gap-3">
+                                    <div className="flex flex-wrap gap-2">
                                         {tasks?.taskCategory?.map((taskCtg: any, index: number) => (
                                             <span key={`${tasks?._id}-${index}`} className="inline-block rounded-lg px-3 py-2 bg-[#9C82F8] text-xs font-medium text-white">
                                                 {taskCtg}
@@ -164,7 +170,7 @@ const TaskCards = () => {
                                     </div>
 
                                     <div className={`bg-gray-50 dark:bg-[#323232] absolute right-4 top-12 px-4 pt-3 pb-4 rounded-md shadow transition-opacity duration-300 overly-panel ${activeOverlay === tasks._id ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
-                                        <span className="text-gray-800 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 duration-300 cursor-pointer block">
+                                        <span className="text-gray-800 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 duration-300 cursor-pointer block" onClick={() => {setTaskDetailsPopup(true), setTaskIdForDetails(tasks._id)}}>
                                             <FaEye size={20} />
                                         </span>
                                         <span onClick={() => handleEditClick(tasks)} className="text-gray-800 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 duration-300 cursor-pointer block mt-3 mb-4">
@@ -180,7 +186,8 @@ const TaskCards = () => {
                     </section>
                 )}
             </BlockUI>
-
+            
+            <TaskDetails taskDetailsPopup={taskDetailsPopup} setTaskDetailsPopup={setTaskDetailsPopup} taskIdForDetails={taskIdForDetails} />
             <AddTaskPopup taskAddForm={taskAddForm} setTaskAddForm={setTaskAddForm} fetchTasks={fetchTasks} />
             <EditTaskPopup taskEditForm={taskEditForm.isOpen} setTaskEditForm={(isOpen) => setTaskEditForm({ isOpen, task: null })} fetchTasks={fetchTasks} task={taskEditForm.task} />
         </>
