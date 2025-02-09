@@ -24,12 +24,13 @@ interface TaskCategory {
 }
 
 interface Props {
-    taskAddForm: boolean;
-    setTaskAddForm: (value: boolean) => void;
+    taskEditForm: boolean;
+    setTaskEditForm: (value: boolean) => void;
     fetchTasks: () => void;
+    task: any;
 }
 
-const EditTaskPopup = ({ taskAddForm, setTaskAddForm, fetchTasks }: Props) => {
+const EditTaskPopup = ({ taskEditForm, setTaskEditForm, fetchTasks, task }: Props) => {
     const [isFormBtnLoading, setIsFormBtnLoading] = useState<boolean>(false);
     const [selectedCategories, setSelectedCategories] = useState<TaskCategory[]>([]);
     const [visibleCtgPopup, setVisibleCtgPopup] = useState<boolean>(false);
@@ -52,6 +53,15 @@ const EditTaskPopup = ({ taskAddForm, setTaskAddForm, fetchTasks }: Props) => {
             taskCategory: [],
         },
     });
+
+    useEffect(() => {
+        if (task) {
+            setValue('taskName', task.taskName);
+            setValue('description', task.description);
+            setValue('dueDate', task.dueDate ? new Date(task.dueDate) : null);
+            setSelectedCategories(task.taskCategory?.map((ctg: string) => ({ taskCategory: ctg })) || []);
+        }
+    }, [task, setValue]);
 
     const fetchCategories = async () => {
         if (!userEmail) return;
@@ -80,40 +90,42 @@ const EditTaskPopup = ({ taskAddForm, setTaskAddForm, fetchTasks }: Props) => {
     };
 
     const onSubmit = async (formData: TaskForm) => {
+        console.log(task._id);
+        
         setIsFormBtnLoading(true);
         try {
             const formattedCategories = selectedCategories.map(category => category.taskCategory);
-            const response = await fetch('/api/tasks', {
-                method: 'POST',
+            const response = await fetch(`/api/tasks/${task._id}`, {
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...formData,
                     dueDate: formData.dueDate ? formData.dueDate.toISOString() : null,
                     taskCategory: formattedCategories,
-                    userEmail: sessionData?.data?.user?.email,
+                    userEmail,
                 }),
             });
 
             const data = await response.json();
             if (data.success) {
-                toast.success("Task added successfully!");
+                toast.success("Task updated successfully!");
                 reset();
-                setTaskAddForm(false);
+                setTaskEditForm(false);
                 setSelectedCategories([]);
                 fetchTasks();
             } else {
                 toast.error(data.message || "Something went wrong!");
             }
         } catch (error) {
-            console.error("Error adding task:", error);
-            alert("Failed to add task.");
+            console.error("Error updating task:", error);
+            toast.error("Failed to update task.");
         } finally {
             setIsFormBtnLoading(false);
         }
     };
 
     return (
-        <Dialog header="Add new task" visible={taskAddForm} className='w-full max-w-[480px]' onHide={() => setTaskAddForm(false)}>
+        <Dialog header="Edit Task" visible={taskEditForm} className='w-full max-w-[480px]' onHide={() => setTaskEditForm(false)}>
             <form className='grid gap-4 pt-5' onSubmit={handleSubmit(onSubmit)}>
                 <div>
                     <label className="mb-1 text-sm text-gray-900 dark:text-gray-50" htmlFor="taskName">
@@ -155,7 +167,7 @@ const EditTaskPopup = ({ taskAddForm, setTaskAddForm, fetchTasks }: Props) => {
                     <ErrorMessage errors={errors} name="taskCategory" render={({ message }) => <span className="text-sm text-red-500">{message}</span>} />
                 </div>
 
-                <Button label="Submit" type="submit" className="primary-btn mt-3 w-full max-w-36 mx-auto" disabled={isFormBtnLoading} loading={isFormBtnLoading} />
+                <Button label="Update" type="submit" className="primary-btn mt-3 w-full max-w-36 mx-auto" disabled={isFormBtnLoading} loading={isFormBtnLoading} />
             </form>
 
             <AddCategory visibleCtgPopup={visibleCtgPopup} setVisibleCtgPopup={setVisibleCtgPopup} onCategoryAdded={handleCategoryAdded} />

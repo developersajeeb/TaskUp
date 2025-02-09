@@ -15,6 +15,7 @@ import CommonLoader from '@/components/CommonLoader';
 import { toast } from 'react-toastify';
 import NoTask from '../../../../public/images/no-task.png';
 import Image from 'next/image';
+import EditTaskPopup from '@/components/EditTaskPopup';
 
 const TaskCards = () => {
     const [taskAddForm, setTaskAddForm] = useState<boolean>(false);
@@ -24,6 +25,10 @@ const TaskCards = () => {
     const [isDataLoading, setDataLoading] = useState<boolean>(true);
     const [activeOverlay, setActiveOverlay] = useState<string | null>(null);
     const [isDeleteIconLoading, setDeleteIconLoading] = useState<boolean>(false);
+    const [taskEditForm, setTaskEditForm] = useState<{ isOpen: boolean; task: any }>({
+        isOpen: false,
+        task: null,
+    });
 
     const fetchTasks = async () => {
         setDataLoading(true);
@@ -86,6 +91,10 @@ const TaskCards = () => {
             document.body.removeEventListener('click', handleOutsideClick);
         };
     }, []);
+
+    const handleEditClick = (task: any) => {
+        setTaskEditForm({ isOpen: true, task });
+    };
 
     return (
         <>
@@ -158,7 +167,7 @@ const TaskCards = () => {
                                         <span className="text-gray-800 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 duration-300 cursor-pointer block">
                                             <FaEye size={20} />
                                         </span>
-                                        <span className="text-gray-800 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 duration-300 cursor-pointer block mt-3 mb-4">
+                                        <span onClick={() => handleEditClick(tasks)} className="text-gray-800 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 duration-300 cursor-pointer block mt-3 mb-4">
                                             <FiEdit3 size={20} />
                                         </span>
                                         <Button className={`text-gray-800 dark:text-white hover:text-red-500 dark:hover:text-red-500 duration-300 cursor-pointer block ${isDeleteIconLoading && 'cursor-wait opacity-50'}`} onClick={() => handleDeleteTask(tasks?._id)} disabled={isDeleteIconLoading}>
@@ -173,6 +182,7 @@ const TaskCards = () => {
             </BlockUI>
 
             <AddTaskPopup taskAddForm={taskAddForm} setTaskAddForm={setTaskAddForm} fetchTasks={fetchTasks} />
+            <EditTaskPopup taskEditForm={taskEditForm.isOpen} setTaskEditForm={(isOpen) => setTaskEditForm({ isOpen, task: null })} fetchTasks={fetchTasks} task={taskEditForm.task} />
         </>
     );
 };
