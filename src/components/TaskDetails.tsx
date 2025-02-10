@@ -1,6 +1,11 @@
 'use client';
+import { ErrorMessage } from '@hookform/error-message';
+import { BlockUI } from 'primereact/blockui';
+import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
+import { InputText } from 'primereact/inputtext';
 import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 interface Props {
     taskDetailsPopup: boolean;
@@ -9,6 +14,7 @@ interface Props {
 }
 
 interface TaskDetailsProps {
+    _id: string;
     taskName: string;
     description: string;
     dueDate: any;
@@ -16,14 +22,20 @@ interface TaskDetailsProps {
     taskCategory: [];
 }
 
+interface TodoListContent {
+    todoListDetails: string;
+}
+
+
 const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails }: Props) => {
     const [taskDetails, setTaskDetails] = useState<TaskDetailsProps | null>(null);
     const [isDataLoading, setDataLoading] = useState<boolean>(true);
+    const [isFormBtnLoading, setIsFormBtnLoading] = useState<boolean>(false);
 
     useEffect(() => {
         if (!taskIdForDetails) return;
-    
-        const fetchTasks = async () => {
+
+        const fetchTasksDetails = async () => {
             setDataLoading(true);
             try {
                 const res = await fetch(`/api/tasks/${taskIdForDetails}`);
@@ -35,15 +47,88 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails }
                 setDataLoading(false);
             }
         };
-    
-        fetchTasks();
-    }, [taskIdForDetails]);
 
-    console.log(taskDetails);
+        fetchTasksDetails();
+    }, [taskIdForDetails, taskDetailsPopup]);
+
+    const customHeader = () => {
+        return (
+            <p>{taskDetails?.taskName || '---'}
+                {taskDetails?.priority !== null &&
+                    <span className={`text-white font-medium text-xs ml-2 py-1 px-2 rounded-lg ${taskDetails?.priority === 'Low' && 'bg-gray-400' || taskDetails?.priority === 'Medium' && 'bg-yellow-500' || taskDetails?.priority === 'High' && 'bg-red-500'}`}>{taskDetails?.priority}</span>
+                }
+            </p>
+        )
+    };
+
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        watch,
+        formState: { errors },
+        reset,
+    } = useForm<TodoListContent>({
+        defaultValues: {
+            todoListDetails: '',
+        },
+    });
+
 
     return (
-        <Dialog header={taskDetails?.taskName} visible={taskDetailsPopup} className='w-full max-w-[850px] mx-4' onHide={() => setTaskDetailsPopup(false)}>
+        <Dialog header={customHeader} visible={taskDetailsPopup} className='w-full max-w-[750px] mx-4' onHide={() => setTaskDetailsPopup(false)}>
+            <BlockUI className="rounded-lg pt-4 pb-3" blocked={isDataLoading} template={
+                <div className='flex space-x-2 justify-center items-center'>
+                    <div className='h-4 w-4 bg-gray-700 dark:bg-white rounded-full animate-bounce [animation-delay:-0.3s]'></div>
+                    <div className='h-4 w-4 bg-gray-700 dark:bg-white rounded-full animate-bounce [animation-delay:-0.15s]'></div>
+                    <div className='h-4 w-4 bg-gray-700 dark:bg-white rounded-full animate-bounce'></div>
+                </div>
+            }>
+                <div className='pt-6'>
+                    {taskDetails?.description && (
+                        <>
+                            <h5 className='text-gray-800 dark:text-white font-medium mb-2'>Description:</h5>
+                            <p className='text-gray-800 dark:text-gray-200 text-sm'>{taskDetails?.description}</p>
+                        </>
+                    )}
 
+                    {taskDetails?.dueDate && (
+                        <p className='text-gray-800 dark:text-white text-sm mt-4'> <span className='font-semibold text-red-500'>Due Date:</span> {new Date(taskDetails.dueDate).toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                        })}</p>
+                    )}
+
+                    {taskDetails?.taskCategory && taskDetails?.taskCategory?.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-8">
+                            {taskDetails?.taskCategory?.map((taskCtg: any, index: number) => (
+                                <span key={`${taskDetails?._id}-${index}`} className="inline-block rounded-lg px-3 py-2 bg-[#9C82F8] text-xs font-medium text-white">
+                                    {taskCtg}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+
+                    <div className='h-[1px] w-full bg-gray-200 dark:bg-gray-800 my-8'></div>
+
+                    <div>
+                        <form>
+                            <label className="mb-1 text-sm text-gray-900 dark:text-gray-50" htmlFor="todoListDetails">
+                                Todo<span className='text-red-500'>*</span>
+                            </label>
+                            <div className='flex gap-3'>
+                                <div className='w-full'>
+                                    <InputText className="tu-input" {...register('todoListDetails', { required: "Content is required" })} />
+                                    <ErrorMessage errors={errors} name="todoListDetails" render={({ message }) => <span className="text-sm text-red-500">{message}</span>} />
+                                </div>
+                                <Button label="Add" type="submit" className="primary-btn w-full max-w-24" disabled={isFormBtnLoading} loading={isFormBtnLoading} />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </BlockUI>
         </Dialog>
     );
 };
