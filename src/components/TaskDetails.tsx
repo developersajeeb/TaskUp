@@ -3,9 +3,12 @@ import { ErrorMessage } from '@hookform/error-message';
 import { BlockUI } from 'primereact/blockui';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
+import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { LuListTree } from 'react-icons/lu';
+import { toast } from 'react-toastify';
 
 interface Props {
     taskDetailsPopup: boolean;
@@ -26,28 +29,36 @@ interface TodoListContent {
     todoListDetails: string;
 }
 
+interface AllPriority {
+    name: string;
+}
 
 const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails }: Props) => {
     const [taskDetails, setTaskDetails] = useState<TaskDetailsProps | null>(null);
     const [isDataLoading, setDataLoading] = useState<boolean>(true);
     const [isFormBtnLoading, setIsFormBtnLoading] = useState<boolean>(false);
+    const [addTodoList, setAddTodoList] = useState<boolean>(false);
+    const [selectedPriority, setSelectedPriority] = useState<AllPriority | null>(null);
+    const allPriority: AllPriority[] = [
+        { name: 'Normal' },
+        { name: 'Low' },
+        { name: 'Medium' },
+        { name: 'High' },
+    ];
 
+    const fetchTasksDetails = async () => {
+        setDataLoading(true);
+        try {
+            const res = await fetch(`/api/tasks/${taskIdForDetails}`);
+            const data = await res.json();
+            setTaskDetails(data?.data);
+        } catch (error) {
+            console.error("Error fetching task:", error);
+        } finally {
+            setDataLoading(false);
+        }
+    };
     useEffect(() => {
-        if (!taskIdForDetails) return;
-
-        const fetchTasksDetails = async () => {
-            setDataLoading(true);
-            try {
-                const res = await fetch(`/api/tasks/${taskIdForDetails}`);
-                const data = await res.json();
-                setTaskDetails(data?.data);
-            } catch (error) {
-                console.error("Error fetching task:", error);
-            } finally {
-                setDataLoading(false);
-            }
-        };
-
         fetchTasksDetails();
     }, [taskIdForDetails, taskDetailsPopup]);
 
@@ -64,8 +75,6 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails }
     const {
         register,
         handleSubmit,
-        setValue,
-        watch,
         formState: { errors },
         reset,
     } = useForm<TodoListContent>({
@@ -74,6 +83,40 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails }
         },
     });
 
+    const handleAddTodo = async (data: TodoListContent) => {
+        if (!taskIdForDetails) return;
+        
+        setIsFormBtnLoading(true);
+    
+        try {
+            const newTodo = {
+                workDone: false,
+                todoName: data.todoListDetails,
+            };
+            const response = await fetch(`/api/tasks/${taskIdForDetails}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ todoList: [newTodo] }),
+            });
+    
+            const result = await response.json();
+    
+            if (result.success) {
+                toast.success("Todo added successfully!");
+                setAddTodoList(false);
+                reset();
+                await fetchTasksDetails();
+            } else {
+                toast.error("Failed to add todo:", result.message);
+            }
+        } catch (error) {
+            console.error("Error adding todo:", error);
+        } finally {
+            setIsFormBtnLoading(false);
+        }
+    };    
+
+    console.log(taskDetails);
 
     return (
         <Dialog header={customHeader} visible={taskDetailsPopup} className='w-full max-w-[750px] mx-4' onHide={() => setTaskDetailsPopup(false)}>
@@ -84,7 +127,7 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails }
                     <div className='h-4 w-4 bg-gray-700 dark:bg-white rounded-full animate-bounce'></div>
                 </div>
             }>
-                <div className='pt-6'>
+                <div className='pt-6 overflow-hidden'>
                     {taskDetails?.description && (
                         <>
                             <h5 className='text-gray-800 dark:text-white font-medium mb-2'>Description:</h5>
@@ -113,9 +156,15 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails }
 
                     <div className='h-[1px] w-full bg-gray-200 dark:bg-gray-800 my-8'></div>
 
-                    <div>
-                        <form>
-                            <label className="mb-1 text-sm text-gray-900 dark:text-gray-50" htmlFor="todoListDetails">
+                    <div className='flex justify-between'>
+                        <button className='primary-btn flex items-center gap-2' onClick={() => setAddTodoList(true)}>Add Todo List <LuListTree size={16} /></button>
+                        <Dropdown value={selectedPriority} onChange={(e: DropdownChangeEvent) => setSelectedPriority(e.value)} options={allPriority} optionLabel="name"
+                            placeholder="Short by Priority" className="tu-dropdown-input max-w-48" />
+                    </div>
+
+                    <Dialog header='Add Todo' visible={addTodoList} className='w-full max-w-[550px] mx-4' onHide={() => setAddTodoList(false)}>
+                        <form className='mt-5' onSubmit={handleSubmit(handleAddTodo)}>
+                            <label className="mb-1 block text-sm text-gray-900 dark:text-gray-50" htmlFor="todoListDetails">
                                 Todo<span className='text-red-500'>*</span>
                             </label>
                             <div className='flex gap-3'>
@@ -126,7 +175,7 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails }
                                 <Button label="Add" type="submit" className="primary-btn w-full max-w-24" disabled={isFormBtnLoading} loading={isFormBtnLoading} />
                             </div>
                         </form>
-                    </div>
+                    </Dialog>
                 </div>
             </BlockUI>
         </Dialog>

@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
+import { NextApiRequest } from "next";
 
+// Delete The Task
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { id } = await params;
@@ -35,6 +37,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   }
 }
 
+// Update the Task
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
 
   try {
@@ -74,6 +77,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
+// Get The Single Task
 export async function GET(
   req: NextRequest,
   { params }: { params?: { id?: string }}
@@ -100,6 +104,43 @@ export async function GET(
     console.error('Error fetching task:', error);
     return NextResponse.json(
       { success: false, message: error.message || 'Internal Server Error' },
+      { status: 500 }
+    );
+  }
+}
+
+// Add The Todo Data
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const { id } = await params;
+
+    if (!id || !ObjectId.isValid(id)) {
+      return NextResponse.json({ success: false, message: "Invalid Task ID" }, { status: 400 });
+    }
+
+    const { todoList } = await req.json();
+
+    if (!todoList) {
+      return NextResponse.json({ success: false, message: "Todo list details are required" }, { status: 400 });
+    }
+
+    const client = await clientPromise;
+    const db = client.db("taskManagement");
+
+    const updatedTask = await db.collection("tasks").updateOne(
+      { _id: new ObjectId(id) },
+      { $addToSet: { todoList: { $each: todoList } } }
+    );
+
+    if (updatedTask.modifiedCount === 0) {
+      return NextResponse.json({ success: false, message: "Task not found or no changes made." }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, message: "Todo list item added successfully!" }, { status: 200 });
+  } catch (error: any) {
+    console.error("Error adding todo list item:", error);
+    return NextResponse.json(
+      { success: false, message: error.message || "Failed to add todo list item" },
       { status: 500 }
     );
   }
