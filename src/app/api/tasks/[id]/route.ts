@@ -112,36 +112,55 @@ export async function GET(
 // Add The Todo Data
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const { id } = await params;
+      const { id } = params;
 
-    if (!id || !ObjectId.isValid(id)) {
-      return NextResponse.json({ success: false, message: "Invalid Task ID" }, { status: 400 });
-    }
+      if (!id || !ObjectId.isValid(id)) {
+          return NextResponse.json({ success: false, message: "Invalid Task ID" }, { status: 400 });
+      }
 
-    const { todoList } = await req.json();
+      const { todoList, updateWorkDone } = await req.json();
 
-    if (!todoList) {
-      return NextResponse.json({ success: false, message: "Todo list details are required" }, { status: 400 });
-    }
+      const client = await clientPromise;
+      const db = client.db("taskManagement");
 
-    const client = await clientPromise;
-    const db = client.db("taskManagement");
+      if (updateWorkDone) {
+          const { todoIndex, workDone } = updateWorkDone;
 
-    const updatedTask = await db.collection("tasks").updateOne(
-      { _id: new ObjectId(id) },
-      { $addToSet: { todoList: { $each: todoList } } }
-    );
+          if (typeof todoIndex !== "number") {
+              return NextResponse.json({ success: false, message: "Todo index is required" }, { status: 400 });
+          }
 
-    if (updatedTask.modifiedCount === 0) {
-      return NextResponse.json({ success: false, message: "Task not found or no changes made." }, { status: 404 });
-    }
+          const updateResult = await db.collection("tasks").updateOne(
+              { _id: new ObjectId(id) },
+              { $set: { [`todoList.${todoIndex}.workDone`]: workDone } }
+          );
 
-    return NextResponse.json({ success: true, message: "Todo list item added successfully!" }, { status: 200 });
+          if (updateResult.modifiedCount === 0) {
+              return NextResponse.json({ success: false, message: "Todo item not found or no changes made" }, { status: 404 });
+          }
+
+          return NextResponse.json({ success: true, message: "Todo status updated successfully!" });
+      }
+
+      if (todoList) {
+          const updatedTask = await db.collection("tasks").updateOne(
+              { _id: new ObjectId(id) },
+              { $push: { todoList: { $each: todoList, $position: 0 } } as any }
+          );
+
+          if (updatedTask.modifiedCount === 0) {
+              return NextResponse.json({ success: false, message: "Task not found or no changes made." }, { status: 404 });
+          }
+
+          return NextResponse.json({ success: true, message: "Todo list item added successfully!" });
+      }
+
+      return NextResponse.json({ success: false, message: "Invalid request body" }, { status: 400 });
   } catch (error: any) {
-    console.error("Error adding todo list item:", error);
-    return NextResponse.json(
-      { success: false, message: error.message || "Failed to add todo list item" },
-      { status: 500 }
-    );
+      console.error("Error handling PATCH request:", error);
+      return NextResponse.json(
+          { success: false, message: error.message || "Failed to process request" },
+          { status: 500 }
+      );
   }
 }

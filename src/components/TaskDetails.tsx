@@ -2,6 +2,7 @@
 import { ErrorMessage } from '@hookform/error-message';
 import { BlockUI } from 'primereact/blockui';
 import { Button } from 'primereact/button';
+import { Checkbox } from 'primereact/checkbox';
 import { Dialog } from 'primereact/dialog';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
@@ -16,6 +17,11 @@ interface Props {
     taskIdForDetails: string | null;
 }
 
+interface TodoItem {
+    workDone: boolean;
+    todoName: string;
+}
+
 interface TaskDetailsProps {
     _id: string;
     taskName: string;
@@ -23,6 +29,7 @@ interface TaskDetailsProps {
     dueDate: any;
     priority: string;
     taskCategory: [];
+    todoList: TodoItem[];
 }
 
 interface TodoListContent {
@@ -38,6 +45,7 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails }
     const [isDataLoading, setDataLoading] = useState<boolean>(true);
     const [isFormBtnLoading, setIsFormBtnLoading] = useState<boolean>(false);
     const [addTodoList, setAddTodoList] = useState<boolean>(false);
+    const [checked, setTasks] = useState<boolean>(false);
     const [selectedPriority, setSelectedPriority] = useState<AllPriority | null>(null);
     const allPriority: AllPriority[] = [
         { name: 'Normal' },
@@ -53,7 +61,7 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails }
             const data = await res.json();
             setTaskDetails(data?.data);
         } catch (error) {
-            console.error("Error fetching task:", error);
+            // console.error("Error fetching task:", error);
         } finally {
             setDataLoading(false);
         }
@@ -85,9 +93,9 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails }
 
     const handleAddTodo = async (data: TodoListContent) => {
         if (!taskIdForDetails) return;
-        
+
         setIsFormBtnLoading(true);
-    
+
         try {
             const newTodo = {
                 workDone: false,
@@ -98,9 +106,9 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails }
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ todoList: [newTodo] }),
             });
-    
+
             const result = await response.json();
-    
+
             if (result.success) {
                 toast.success("Todo added successfully!");
                 setAddTodoList(false);
@@ -114,9 +122,33 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails }
         } finally {
             setIsFormBtnLoading(false);
         }
-    };    
+    };
 
-    console.log(taskDetails);
+    const handleCheckboxClick = async (index: number, checked: boolean) => {
+        if (!taskIdForDetails) return;
+
+        try {
+            const response = await fetch(`/api/tasks/${taskIdForDetails}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ updateWorkDone: { todoIndex: index, workDone: checked } }),
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                toast.success("Todo status updated successfully!");
+                await fetchTasksDetails();
+            } else {
+                toast.error("Failed to update todo status.");
+            }
+        } catch (error) {
+            console.error("Error updating todo status:", error);
+        }
+    };
+
+
+    console.log(taskDetails?.todoList);
 
     return (
         <Dialog header={customHeader} visible={taskDetailsPopup} className='w-full max-w-[750px] mx-4' onHide={() => setTaskDetailsPopup(false)}>
@@ -156,11 +188,21 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails }
 
                     <div className='h-[1px] w-full bg-gray-200 dark:bg-gray-800 my-8'></div>
 
-                    <div className='flex justify-between'>
-                        <button className='primary-btn flex items-center gap-2' onClick={() => setAddTodoList(true)}>Add Todo List <LuListTree size={16} /></button>
-                        <Dropdown value={selectedPriority} onChange={(e: DropdownChangeEvent) => setSelectedPriority(e.value)} options={allPriority} optionLabel="name"
-                            placeholder="Short by Priority" className="tu-dropdown-input max-w-48" />
-                    </div>
+                    <button className='primary-btn flex items-center gap-2' onClick={() => setAddTodoList(true)}>Add Todo List <LuListTree size={16} /></button>
+
+                    <ul className='grid gap-5 mt-12'>
+                        {taskDetails?.todoList?.map((todo: any, index: number) => {
+                            return (
+                                <li key={index} className={`flex flex-col md:flex-row gap-3 bg-gray-100 dark:bg-[#303030] p-4 md:p-5 rounded-lg border-2 border-gray-20 dark:border-[#484848] ${todo.workDone === true && 'line-through opacity-50'}`}>
+                                    <Checkbox
+                                        onChange={e => handleCheckboxClick(index, e.checked ?? false)}
+                                        checked={todo.workDone ?? false}
+                                    />
+                                    <p className='text-gray-800 dark:text-white'>{todo?.todoName}</p>
+                                </li>
+                            )
+                        })}
+                    </ul>
 
                     <Dialog header='Add Todo' visible={addTodoList} className='w-full max-w-[550px] mx-4' onHide={() => setAddTodoList(false)}>
                         <form className='mt-5' onSubmit={handleSubmit(handleAddTodo)}>
