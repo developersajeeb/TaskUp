@@ -31,7 +31,7 @@ const TaskCards = () => {
     const [taskEditForm, setTaskEditForm] = useState<{ isOpen: boolean; task: any }>({
         isOpen: false,
         task: null,
-    });    
+    });
 
     const fetchTasks = async () => {
         setDataLoading(true);
@@ -156,9 +156,17 @@ const TaskCards = () => {
                                                 </span>{" "}
                                                 Progress
                                             </p>
-                                            <p className="text-xs font-medium text-gray-600 dark:text-gray-100">2/6</p>
+                                            <p className="text-xs font-medium text-gray-600 dark:text-gray-100">
+                                                {tasks?.todoList
+                                                    ? `${tasks.todoList.filter((task: { workDone: string; }) => task.workDone).length}/${tasks.todoList.length}`
+                                                    : '0/0'}
+                                            </p>
                                         </div>
-                                        <ProgressBar className="text-xs bg-white dark:bg-gray-200 h-3" value={50}></ProgressBar>
+                                        <ProgressBar
+                                            className="text-xs bg-white dark:bg-gray-200 h-3"
+                                            value={Math.round((tasks?.todoList?.filter((task: { workDone: string; }) => task.workDone).length || 0) / (tasks?.todoList?.length || 1) * 100)}>
+                                        </ProgressBar>
+
                                     </div>
 
                                     <div className="flex flex-wrap gap-2">
@@ -170,7 +178,7 @@ const TaskCards = () => {
                                     </div>
 
                                     <div className={`bg-gray-50 dark:bg-[#323232] absolute right-4 top-12 px-4 pt-3 pb-4 rounded-md shadow transition-opacity duration-300 overly-panel ${activeOverlay === tasks._id ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
-                                        <span className="text-gray-800 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 duration-300 cursor-pointer block" onClick={() => {setTaskDetailsPopup(true), setTaskIdForDetails(tasks._id)}}>
+                                        <span className="text-gray-800 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 duration-300 cursor-pointer block" onClick={() => { setTaskDetailsPopup(true), setTaskIdForDetails(tasks._id) }}>
                                             <FaEye size={20} />
                                         </span>
                                         <span onClick={() => handleEditClick(tasks)} className="text-gray-800 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 duration-300 cursor-pointer block mt-3 mb-4">
@@ -186,7 +194,7 @@ const TaskCards = () => {
                     </section>
                 )}
             </BlockUI>
-            
+
             <TaskDetails taskDetailsPopup={taskDetailsPopup} setTaskDetailsPopup={setTaskDetailsPopup} taskIdForDetails={taskIdForDetails} />
             <AddTaskPopup taskAddForm={taskAddForm} setTaskAddForm={setTaskAddForm} fetchTasks={fetchTasks} />
             <EditTaskPopup taskEditForm={taskEditForm.isOpen} setTaskEditForm={(isOpen) => setTaskEditForm({ isOpen, task: null })} fetchTasks={fetchTasks} task={taskEditForm.task} />

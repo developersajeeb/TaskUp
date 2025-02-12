@@ -147,9 +147,6 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails }
         }
     };
 
-
-    console.log(taskDetails?.todoList);
-
     return (
         <Dialog header={customHeader} visible={taskDetailsPopup} className='w-full max-w-[750px] mx-4' onHide={() => setTaskDetailsPopup(false)}>
             <BlockUI className="rounded-lg pt-4 pb-3" blocked={isDataLoading} template={
