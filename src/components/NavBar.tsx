@@ -23,9 +23,9 @@ const NavBar = () => {
     useEffect(() => {
         const handleScroll = () => {
             if (window.scrollY > 50) {
-                document.querySelector('.top-nav-wrapper')?.classList.add('border', 'border-gray-100', 'dark:border-none', 'dark:shadow-xl');
+                document.querySelector('.top-nav-wrapper')?.classList.add('border-b', 'border-gray-100', 'dark:border-none', 'shadow-[0px_-2px_13px_0px_rgba(44,44,44,0.1)]', 'dark:shadow-xl');
             } else {
-                document.querySelector('.top-nav-wrapper')?.classList.remove('border', 'border-gray-100', 'dark:border-none', 'dark:shadow-xl');
+                document.querySelector('.top-nav-wrapper')?.classList.remove('border-b', 'border-gray-100', 'dark:border-none', 'shadow-[0px_-2px_13px_0px_rgba(44,44,44,0.1)]', 'dark:shadow-xl');
             }
         };
 

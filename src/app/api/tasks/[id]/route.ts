@@ -78,17 +78,13 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 }
 
 // Get The Single Task
-export async function GET(
-  req: NextRequest,
-  { params }: { params?: { id?: string }}
-) {
+export async function GET(req: NextRequest, { params }: { params: { id?: string } }) {
   try {
-    const paramsValue = await params;
-    if (!paramsValue || !paramsValue.id) {
-      return NextResponse.json({ success: false, message: "Task ID is required." }, { status: 400 });
-    }
+    const {id} = await params;
 
-    const { id } = paramsValue;
+    if (!id || id === "null" || id === "undefined" || id.length !== 24 || !/^[0-9a-fA-F]{24}$/.test(id)) {
+      return NextResponse.json({ success: false, message: "Invalid Task ID." }, { status: 400 });
+    }
 
     const client = await clientPromise;
     const db = client.db("taskManagement");
@@ -101,66 +97,10 @@ export async function GET(
 
     return NextResponse.json({ success: true, data: task });
   } catch (error: any) {
-    console.error('Error fetching task:', error);
+    console.error("Error fetching task:", error);
     return NextResponse.json(
-      { success: false, message: error.message || 'Internal Server Error' },
+      { success: false, message: error.message || "Internal Server Error" },
       { status: 500 }
     );
-  }
-}
-
-// Add The Todo Data
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
-  try {
-      const { id } = params;
-
-      if (!id || !ObjectId.isValid(id)) {
-          return NextResponse.json({ success: false, message: "Invalid Task ID" }, { status: 400 });
-      }
-
-      const { todoList, updateWorkDone } = await req.json();
-
-      const client = await clientPromise;
-      const db = client.db("taskManagement");
-
-      if (updateWorkDone) {
-          const { todoIndex, workDone } = updateWorkDone;
-
-          if (typeof todoIndex !== "number") {
-              return NextResponse.json({ success: false, message: "Todo index is required" }, { status: 400 });
-          }
-
-          const updateResult = await db.collection("tasks").updateOne(
-              { _id: new ObjectId(id) },
-              { $set: { [`todoList.${todoIndex}.workDone`]: workDone } }
-          );
-
-          if (updateResult.modifiedCount === 0) {
-              return NextResponse.json({ success: false, message: "Todo item not found or no changes made" }, { status: 404 });
-          }
-
-          return NextResponse.json({ success: true, message: "Todo status updated successfully!" });
-      }
-
-      if (todoList) {
-          const updatedTask = await db.collection("tasks").updateOne(
-              { _id: new ObjectId(id) },
-              { $push: { todoList: { $each: todoList, $position: 0 } } as any }
-          );
-
-          if (updatedTask.modifiedCount === 0) {
-              return NextResponse.json({ success: false, message: "Task not found or no changes made." }, { status: 404 });
-          }
-
-          return NextResponse.json({ success: true, message: "Todo list item added successfully!" });
-      }
-
-      return NextResponse.json({ success: false, message: "Invalid request body" }, { status: 400 });
-  } catch (error: any) {
-      console.error("Error handling PATCH request:", error);
-      return NextResponse.json(
-          { success: false, message: error.message || "Failed to process request" },
-          { status: 500 }
-      );
   }
 }
