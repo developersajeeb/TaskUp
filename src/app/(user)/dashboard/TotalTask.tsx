@@ -2,7 +2,11 @@
 import React, { useEffect, useState } from 'react';
 import { Chart } from 'primereact/chart';
 
-const TotalTaskGraph = () => {
+interface Props {
+    tasks: [];
+}
+
+const TotalTaskGraph = ({ tasks }: Props) => {
     const [chartData, setChartData] = useState({});
     const [chartOptions, setChartOptions] = useState({});
 
@@ -19,7 +23,7 @@ const TotalTaskGraph = () => {
             labels: ['Total', 'Complete', 'Pending'],
             datasets: [
                 {
-                    data: [300, 50, 100],
+                    data: [`${tasks?.length}`, 50, 100],
                     backgroundColor: [colors.blue, colors.purple, colors.green],
                     hoverBackgroundColor: [colors.blueHover, colors.purpleHover, colors.greenHover],
                 }

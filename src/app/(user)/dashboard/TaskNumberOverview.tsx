@@ -1,12 +1,16 @@
 'use client';
 import { useSession } from 'next-auth/react';
-import React from 'react';
+import React, { Suspense } from 'react';
 import ManWork from '../../../../public/images/man-working-on-laptop.png';
 import { GoTasklist } from 'react-icons/go';
 import { RiProgress2Line } from 'react-icons/ri';
 import { CgGoogleTasks } from 'react-icons/cg';
 
-const TaskNumberOverview = () => {
+interface Props {
+    tasks: [];
+}
+
+const TaskNumberOverview = ({ tasks }: Props) => {
     const session = useSession();
 
     return (
@@ -20,7 +24,7 @@ const TaskNumberOverview = () => {
                 </span>
                 <div>
                     <h3 className="text-sm leading-0 font-medium text-gray-600 dark:text-white">Total Tasks</h3>
-                    <p className='text-xl leading-0 font-semibold text-gray-800 dark:text-white'>52</p>
+                    <p className='text-xl leading-0 font-semibold text-gray-800 dark:text-white'>{tasks?.length || 0}</p>
                 </div>
             </div>
             <div className='flex gap-2 items-center mt-5'>

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import TotalTaskGraph from './TotalTask';
 import TaskNumberOverview from './TaskNumberOverview';
 import { getServerSession } from 'next-auth';
+import { Skeleton } from 'primereact/skeleton';
 
 export const metadata = {
     title: "Dashboard - TaskUp",
@@ -29,19 +30,20 @@ const getTasks = async (userEmail: string | null) => {
 const Dashboard = async () => {
     const session = await getServerSession();
     const userEmail = session?.user?.email || null;
-
     const tasks = await getTasks(userEmail);
-    // console.log(tasks);
-    
 
     return (
         <>
             <section className='grid xl:grid-cols-3 gap-8'>
                 <div className='xl:col-span-2 bg-gray-50 dark:bg-[#1f1f1f] text-gray-900 dark:text-white px-5 md:px-8 pt-5 md:pt-8 rounded-2xl'>
-                    <TaskNumberOverview />
+                    <Suspense fallback={<Skeleton width="100%" height="220px" className='dark:bg-[#1a1a1a] rounded-xl'></Skeleton>}>
+                        <TaskNumberOverview tasks={tasks} />
+                    </Suspense>
                 </div>
                 <div className='xl:col-span-1 bg-gray-50 dark:bg-[#1f1f1f] p-4 rounded-2xl'>
-                    <TotalTaskGraph />
+                    <Suspense fallback={<Skeleton width="100%" height="100%" className='dark:bg-[#1a1a1a] rounded-xl'></Skeleton>}>
+                        <TotalTaskGraph tasks={tasks} />
+                    </Suspense>
                 </div>
             </section>
 
