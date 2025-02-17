@@ -4,9 +4,11 @@ import { Chart } from 'primereact/chart';
 
 interface Props {
     tasks: [];
+    completeTasks: [];
+    incompleteTasks: [];
 }
 
-const TotalTaskGraph = ({ tasks }: Props) => {
+const TotalTaskGraph = ({ tasks, completeTasks, incompleteTasks }: Props) => {
     const [chartData, setChartData] = useState({});
     const [chartOptions, setChartOptions] = useState({});
 
@@ -23,7 +25,7 @@ const TotalTaskGraph = ({ tasks }: Props) => {
             labels: ['Total', 'Complete', 'Pending'],
             datasets: [
                 {
-                    data: [`${tasks?.length}`, 50, 100],
+                    data: [`${tasks?.length || 0}`, `${completeTasks?.length || 0}`, `${incompleteTasks?.length || 0}`],
                     backgroundColor: [colors.blue, colors.purple, colors.green],
                     hoverBackgroundColor: [colors.blueHover, colors.purpleHover, colors.greenHover],
                 }
@@ -39,7 +41,11 @@ const TotalTaskGraph = ({ tasks }: Props) => {
 
     return (
         <>
-            <Chart type="doughnut" data={chartData} options={chartOptions} className="max-w-[262px] w-full mx-auto" />
+            {tasks?.length === 0 && completeTasks?.length === 0 && incompleteTasks?.length === 0 ? (
+                <div className='text-gray-800 dark:text-white h-full flex items-center justify-center'><p>No Data Available.</p></div>
+            ) : (
+                <Chart type="doughnut" data={chartData} options={chartOptions} className="max-w-[262px] w-full mx-auto" />
+            )}
         </>
     );
 };

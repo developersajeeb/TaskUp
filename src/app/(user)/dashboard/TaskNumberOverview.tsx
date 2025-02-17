@@ -8,9 +8,11 @@ import { CgGoogleTasks } from 'react-icons/cg';
 
 interface Props {
     tasks: [];
+    completeTasks: [];
+    incompleteTasks: [];
 }
 
-const TaskNumberOverview = ({ tasks }: Props) => {
+const TaskNumberOverview = ({ tasks, completeTasks, incompleteTasks }: Props) => {
     const session = useSession();
 
     return (
@@ -33,7 +35,7 @@ const TaskNumberOverview = ({ tasks }: Props) => {
                 </span>
                 <div>
                     <h3 className="text-sm leading-0 font-medium text-gray-600 dark:text-white">In Progress</h3>
-                    <p className='text-xl leading-0 font-semibold text-gray-800 dark:text-white'>10</p>
+                    <p className='text-xl leading-0 font-semibold text-gray-800 dark:text-white'>{incompleteTasks?.length || 0}</p>
                 </div>
             </div>
             <div className='flex gap-2 items-center mt-5'>
@@ -42,7 +44,7 @@ const TaskNumberOverview = ({ tasks }: Props) => {
                 </span>
                 <div>
                     <h3 className="text-sm leading-0 font-medium text-gray-600 dark:text-white">Completed</h3>
-                    <p className='text-xl leading-0 font-semibold text-gray-800 dark:text-white'>10</p>
+                    <p className='text-xl leading-0 font-semibold text-gray-800 dark:text-white'>{completeTasks?.length || 0}</p>
                 </div>
             </div>
         </div>
