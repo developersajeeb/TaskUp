@@ -89,7 +89,7 @@ const Dashboard = async () => {
             </section>
 
             <section className='mt-12'>
-                <DataTable tasks={tasks} completeTasks={completeTasks} incompleteTasks={incompleteTasks} />
+                <DataTable tasks={tasks} />
             </section>
         </>
     );

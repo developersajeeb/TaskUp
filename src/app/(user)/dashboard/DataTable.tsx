@@ -9,7 +9,8 @@ import { IoEyeOutline } from 'react-icons/io5';
 import TaskDetails from '@/components/TaskDetails';
 import { toast } from 'react-toastify';
 import { Button } from 'primereact/button';
-import { FiTrash2 } from 'react-icons/fi';
+import { FiEdit3, FiTrash2 } from 'react-icons/fi';
+import EditTaskPopup from '@/components/EditTaskPopup';
 
 interface TodoItem {
     workDone: boolean;
@@ -38,8 +39,6 @@ interface TaskDetailsProps {
 
 interface Props {
     tasks: Task[];
-    completeTasks: Task[];
-    incompleteTasks: Task[];
 }
 
 const TaskTable: React.FC<Props> = ({ tasks }) => {
@@ -51,6 +50,10 @@ const TaskTable: React.FC<Props> = ({ tasks }) => {
     const [taskIdForDetails, setTaskIdForDetails] = useState<string | null>(null);
     const [taskDetails, setTaskDetails] = useState<TaskDetailsProps | null>(null);
     const [isDeleteIconLoading, setDeleteIconLoading] = useState<boolean>(false);
+    const [taskEditForm, setTaskEditForm] = useState<{ isOpen: boolean; task: any }>({
+            isOpen: false,
+            task: null,
+        });
 
     useEffect(() => {
         setFirst((currentPage - 1) * rowsPerPage);
@@ -79,6 +82,10 @@ const TaskTable: React.FC<Props> = ({ tasks }) => {
             console.error("Error deleting task:", error);
             toast.error("Failed to delete task");
         }
+    };
+
+    const handleEditClick = (task: any) => {
+        setTaskEditForm({ isOpen: true, task });
     };
 
     return (
@@ -180,6 +187,9 @@ const TaskTable: React.FC<Props> = ({ tasks }) => {
                             <Button onClick={() => handleDeleteTask(item?._id)} className={`text-red-500 hover:text-red-600 dark:hover:text-red-600 duration-300 cursor-pointer inline-block ${isDeleteIconLoading && 'cursor-wait opacity-50'}`} disabled={isDeleteIconLoading}>
                                 <FiTrash2 size={18} />
                             </Button>
+                            <span onClick={() => handleEditClick(item)} className="text-blue-500 hover:text-[#004A95] duration-300 cursor-pointer inline-block">
+                                <FiEdit3 size={18} />
+                            </span>
                         </div>
                     )}
                 ></Column>
@@ -194,6 +204,7 @@ const TaskTable: React.FC<Props> = ({ tasks }) => {
                 onPageChange={(e) => setCurrentPage(e.page + 1)}
             />
             <TaskDetails taskDetailsPopup={taskDetailsPopup} setTaskDetailsPopup={setTaskDetailsPopup} taskIdForDetails={taskIdForDetails} taskDetails={taskDetails} setTaskDetails={setTaskDetails} />
+            <EditTaskPopup taskEditForm={taskEditForm.isOpen} setTaskEditForm={(isOpen) => setTaskEditForm({ isOpen, task: null })} fetchTasks={taskList} task={taskEditForm.task} />
         </div>
     );
 };
