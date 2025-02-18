@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
 
         const tasks = await db.collection("tasks").find({
             userEmail,
-            todoList: { $not: { $elemMatch: { workDone: false } } }, // Ensures all todos are completed
+            todoList: { $exists: true, $ne: [], $not: { $elemMatch: { workDone: false } } } // Ensures all todos are completed
         }).sort({ _id: -1 }).toArray();
 
         return NextResponse.json({ success: true, data: tasks });

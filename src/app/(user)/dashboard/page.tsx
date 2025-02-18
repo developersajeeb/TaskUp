@@ -3,6 +3,7 @@ import TotalTaskGraph from './TotalTask';
 import TaskNumberOverview from './TaskNumberOverview';
 import { getServerSession } from 'next-auth';
 import { Skeleton } from 'primereact/skeleton';
+import DataTable from './DataTable';
 
 export const metadata = {
     title: "Dashboard - TaskUp",
@@ -49,7 +50,7 @@ const getCompletedTasks = async (userEmail: string | null) => {
 const getIncompleteTasks = async (userEmail: string | null) => {
     if (!userEmail) return [];
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/tasks/completed?userEmail=${encodeURIComponent(userEmail)}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/tasks/incomplete?userEmail=${encodeURIComponent(userEmail)}`, {
             cache: 'no-store',
         });
 
@@ -87,7 +88,9 @@ const Dashboard = async () => {
                 </div>
             </section>
 
-            <section className='bg-gray-50 dark:bg-[#1f1f1f] rounded-2xl'></section>
+            <section className='mt-12'>
+                <DataTable tasks={tasks} completeTasks={completeTasks} incompleteTasks={incompleteTasks} />
+            </section>
         </>
     );
 };
