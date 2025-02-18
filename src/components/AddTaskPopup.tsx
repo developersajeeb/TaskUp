@@ -174,7 +174,7 @@ const AddTaskPopup = ({ taskAddForm, setTaskAddForm, fetchTasks }: Props) => {
                             Priority
                         </label>
                         <Dropdown value={taskPriority} onChange={(e: DropdownChangeEvent) => setTaskPriority(e.value)} options={allPriority} optionLabel="name"
-                            placeholder="Select a City" className="w-full tu-dropdown-input" />
+                            placeholder="Select a priority" className="w-full tu-dropdown-input" />
                     </div>
                 </div>
 

@@ -70,3 +70,13 @@
 .p-checkbox-box {
     @apply border-[#9C82F8];
 }
+
+.p-paginator-page {
+    &.p-paginator-element {
+        @apply hover:text-[#004A95] transition-all;
+
+        &.p-highlight {
+            @apply bg-[#98bbe0] text-white transition-all min-w-[34px] h-[34px];
+        }
+    }
+}

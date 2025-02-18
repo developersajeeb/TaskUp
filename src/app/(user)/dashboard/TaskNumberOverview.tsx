@@ -21,7 +21,7 @@ const TaskNumberOverview = ({ tasks, completeTasks, incompleteTasks }: Props) =>
             <p className='mt-1 text-sm'>All tasks overview</p>
 
             <div className='flex gap-2 items-center mt-6'>
-                <span className="flex h-11 w-11 max-w-11 items-center justify-center rounded-full bg-[#DEFEF3] dark:bg-[#1B3C48] text-[#58D08B] dark:text-[#46AB7A] ">
+                <span className="flex h-11 w-11 max-w-11 items-center justify-center rounded-full bg-[#eae5fc] dark:bg-[#50437c] text-[#9C82FA] dark:text-[#977fee]">
                     <GoTasklist size={24} />
                 </span>
                 <div>
@@ -30,7 +30,7 @@ const TaskNumberOverview = ({ tasks, completeTasks, incompleteTasks }: Props) =>
                 </div>
             </div>
             <div className='flex gap-2 items-center mt-5'>
-                <span className="flex h-11 w-11 max-w-11 items-center justify-center rounded-full bg-[#fff1e0] dark:bg-[#4D3A2A] text-[#fac785] dark:text-[#CD9E63] ">
+                <span className="flex h-11 w-11 max-w-11 items-center justify-center rounded-full bg-[#fff1e0] dark:bg-[#4D3A2A] text-[#fac785] dark:text-[#CD9E63]">
                     <RiProgress2Line size={24} />
                 </span>
                 <div>
@@ -39,7 +39,7 @@ const TaskNumberOverview = ({ tasks, completeTasks, incompleteTasks }: Props) =>
                 </div>
             </div>
             <div className='flex gap-2 items-center mt-5'>
-                <span className="flex h-11 w-11 max-w-11 items-center justify-center rounded-full bg-[#eae5fc] dark:bg-[#50437c] text-[#9C82FA] dark:text-[#977fee] ">
+                <span className="flex h-11 w-11 max-w-11 items-center justify-center rounded-full bg-[#DEFEF3] dark:bg-[#1B3C48] text-[#58D08B] dark:text-[#46AB7A]">
                     <CgGoogleTasks size={24} />
                 </span>
                 <div>
