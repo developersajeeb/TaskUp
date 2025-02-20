@@ -37,8 +37,8 @@ const TaskCards = () => {
     const [taskAddForm, setTaskAddForm] = useState<boolean>(false);
     const [taskDetailsPopup, setTaskDetailsPopup] = useState<boolean>(false);
     const { data } = useSession();
-    const [allTasks, setAllTasks] = useState<{ data: any[] } | null>(null);
     const userEmail = data?.user?.email;
+    const [allTasks, setAllTasks] = useState<{ data: any[] } | null>(null);
     const [isDataLoading, setDataLoading] = useState<boolean>(true);
     const [activeOverlay, setActiveOverlay] = useState<string | null>(null);
     const [isDeleteIconLoading, setDeleteIconLoading] = useState<boolean>(false);

@@ -3,7 +3,7 @@ import TotalTaskGraph from './TotalTask';
 import TaskNumberOverview from './TaskNumberOverview';
 import { getServerSession } from 'next-auth';
 import { Skeleton } from 'primereact/skeleton';
-import DataTable from './DataTable';
+import TaskTable from '@/components/TaskTable';
 
 export const metadata = {
     title: "Dashboard - TaskUp",
@@ -89,7 +89,7 @@ const Dashboard = async () => {
             </section>
 
             <section className='mt-12'>
-                <DataTable tasks={tasks} />
+                <TaskTable />
             </section>
         </>
     );

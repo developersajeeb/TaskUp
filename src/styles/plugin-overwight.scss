@@ -80,3 +80,11 @@
         }
     }
 }
+
+.p-datatable-emptymessage {
+    @apply text-sm bg-gray-50 dark:bg-[#1f1f1f] dark:text-gray-200;
+
+    td {
+        @apply text-center
+    }
+}
