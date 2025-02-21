@@ -220,7 +220,7 @@ const TaskTable = () => {
                                     <span onClick={() => { setTaskDetailsPopup(true), setTaskIdForDetails(item._id) }} className="text-blue-500 hover:text-[#004A95] duration-300 cursor-pointer inline-block">
                                         <IoEyeOutline size={20} />
                                     </span>
-                                    <Button onClick={() => handleDeleteTodo(item?._id)} className={`text-red-500 hover:text-red-600 dark:hover:text-red-600 duration-300 cursor-pointer inline-block ${isDeleteIconLoading && 'cursor-wait opacity-50'}`} disabled={isDeleteIconLoading}>
+                                    <Button onClick={() => handleDeleteTodo(item?._id)} className={`text-red-500 hover:text-red-600 dark:hover:text-red-600 duration-300 cursor-pointer inline-block focus:shadow-none ${isDeleteIconLoading && 'cursor-wait opacity-50'}`} disabled={isDeleteIconLoading}>
                                         <FiTrash2 size={18} />
                                     </Button>
                                     <span onClick={() => handleEditClick(item)} className="text-blue-500 hover:text-[#004A95] duration-300 cursor-pointer inline-block">

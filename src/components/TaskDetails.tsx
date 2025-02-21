@@ -11,7 +11,8 @@ import { FiTrash2 } from 'react-icons/fi';
 import { LuListTree } from 'react-icons/lu';
 import { toast } from 'react-toastify';
 import DeletePopup from './DeletePoup';
-import { addTodo, deleteTodo, fetchTaskDetails, updateTodoStatus } from '@/services/task';
+import {fetchTaskDetails } from '@/services/task';
+import { addTodo, deleteTodo, updateTodoStatus } from '@/services/todo';
 
 interface Props {
     taskDetailsPopup: boolean;
@@ -148,7 +149,7 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails, 
 
     return (
         <Dialog header={customHeader} visible={taskDetailsPopup} className='w-full max-w-[750px] mx-4 z-[70]' onHide={() => setTaskDetailsPopup(false)}>
-            <BlockUI className="rounded-lg pt-4 pb-3" blocked={isDataLoading} template={
+            <BlockUI className="rounded-lg py-3 mt-4" blocked={isDataLoading} template={
                 <div className='flex space-x-2 justify-center items-center'>
                     <div className='h-4 w-4 bg-gray-700 dark:bg-white rounded-full animate-bounce [animation-delay:-0.3s]'></div>
                     <div className='h-4 w-4 bg-gray-700 dark:bg-white rounded-full animate-bounce [animation-delay:-0.15s]'></div>

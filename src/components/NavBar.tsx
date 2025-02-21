@@ -9,7 +9,11 @@ import Image from 'next/image';
 import Logo from '../../public/images/logo-icon.png';
 import { CgMenuLeft } from 'react-icons/cg';
 
-const NavBar = () => {
+interface Props {
+    setVisible: (value: boolean) => void;
+}
+
+const NavBar: React.FC<Props> = ({setVisible})=> {
     const session = useSession();
     const op = useRef<OverlayPanel | null>(null);
     const [isLoginLoading, setIsLoggingOut] = useState<boolean>(false);
@@ -43,13 +47,13 @@ const NavBar = () => {
                     <Link href='/'>
                         <Image src={Logo} alt='Logo' width={40} height={40} />
                     </Link>
-                    <span><CgMenuLeft size={24} /></span>
+                    <span onClick={() => setVisible(true)}><CgMenuLeft size={24} /></span>
                 </div>
                 {session.status === "authenticated" && (
                     <div className='flex gap-3 md:gap-5 items-center'>
                         <ThemeSwitch />
-                        <p className='text-sm dark:text-white cursor-pointer' onClick={(e) => op.current?.toggle(e)} >
-                            Hi, {session?.data?.user?.name && session?.data?.user?.name.length > 6 ? `${session?.data?.user?.name.substring(0, 6)}...` : session?.data?.user?.name}
+                        <p className='cursor-pointer bg-[#FCE7A4] dark:bg-[#ffe17ed6] w-[30px] h-[30px] rounded-full flex justify-center items-center text-sm text-gray-800 font-medium' onClick={(e) => op.current?.toggle(e)} >
+                            {session?.data?.user?.name && session?.data?.user?.name.substring(0, 1)}
                             <OverlayPanel className='dark:bg-[#323232]' ref={op}>
                                 <Button
                                     label="Log out"

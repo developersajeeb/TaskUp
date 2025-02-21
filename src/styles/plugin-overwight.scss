@@ -3,7 +3,7 @@
 }
 
 .p-dialog-header {
-    @apply py-[14px] bg-gray-50 dark:bg-[#19181a];
+    @apply py-[14px] bg-gray-100 dark:bg-[#1f1f1f];
     
     .p-dialog-title {
         @apply dark:text-white font-medium text-lg;
@@ -87,4 +87,16 @@
     td {
         @apply text-center
     }
+}
+
+.p-sidebar-header {
+    @apply bg-gray-100 dark:bg-[#1f1f1f] py-4;
+
+    .p-sidebar-close {
+        @apply dark:text-gray-200;
+    }
+}
+
+.p-sidebar-content {
+    @apply bg-[#fefefe] dark:bg-[#1B1B1B];
 }

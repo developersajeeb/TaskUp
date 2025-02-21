@@ -6,8 +6,7 @@ import React from 'react';
 import { RxDashboard } from 'react-icons/rx';
 import Logo from '../../public/images/logo.png';
 import { GoTasklist } from 'react-icons/go';
-import { RiProgress2Line } from 'react-icons/ri';
-import { CgGoogleTasks } from 'react-icons/cg';
+import { TbCategory2 } from 'react-icons/tb';
 
 const DeskTopSidebar = () => {
     const pathname = usePathname();
@@ -19,10 +18,9 @@ const DeskTopSidebar = () => {
 
             <div className='h-[calc(100%-170px)] flex items-center justify-center'>
                 <ul className='text-gray-700 dark:text-white text-sm font-medium mt-12 grid gap-5'>
-                    <li><Link className={`flex items-center gap-2 ${pathname === '/dashboard' ? 'text-[#9C83F2]' : ''}`} href='/dashboard'><RxDashboard size={20} /> Dashboard</Link></li>
-                    <li><Link className={`flex items-center gap-2 ${pathname === '/task' ? 'text-[#9C83F2]' : ''}`} href='/task'><GoTasklist size={20} /> Tasks</Link></li>
-                    <li><Link className={`flex items-center gap-2 ${pathname === '/in-progress-task' ? 'text-[#9C83F2]' : ''}`} href='/in-progress-task'><RiProgress2Line size={20} /> In Progress Tasks</Link></li>
-                    <li><Link className={`flex items-center gap-2 ${pathname === '/completed-task' ? 'text-[#9C83F2]' : ''}`} href='/completed-task'><CgGoogleTasks size={20} /> Completed Tasks</Link></li>
+                    <li><Link className={`flex items-center gap-2 hover:text-[#7e5cee] duration-300 ${pathname === '/dashboard' ? 'text-[#9C83F2]' : ''}`} href='/dashboard'><RxDashboard size={20} /> Dashboard</Link></li>
+                    <li><Link className={`flex items-center gap-2 hover:text-[#7e5cee] duration-300 ${pathname === '/task' ? 'text-[#9C83F2]' : ''}`} href='/task'><GoTasklist size={20} /> Tasks</Link></li>
+                    <li><Link className={`flex items-center gap-2 hover:text-[#7e5cee] duration-300 ${pathname === '/categories' ? 'text-[#9C83F2]' : ''}`} href='/categories'><TbCategory2 size={20} /> Categories</Link></li>
                 </ul>
             </div>
         </aside>

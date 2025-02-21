@@ -18,6 +18,7 @@ import Image from 'next/image';
 import EditTaskPopup from '@/components/EditTaskPopup';
 import TaskDetails from '@/components/TaskDetails';
 import { deleteTask, fetchTasks } from '@/services/task';
+import DeletePopup from '@/components/DeletePoup';
 
 interface TodoItem {
     workDone: boolean;
@@ -44,6 +45,8 @@ const TaskCards = () => {
     const [activeOverlay, setActiveOverlay] = useState<string | null>(null);
     const [isDeleteIconLoading, setDeleteIconLoading] = useState<boolean>(false);
     const [taskIdForDetails, setTaskIdForDetails] = useState<string | null>(null);
+    const [deletePopup, setDeletePopup] = useState<boolean>(false);
+    const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null);
     const [taskEditForm, setTaskEditForm] = useState<{ isOpen: boolean; task: any }>({
         isOpen: false,
         task: null,
@@ -63,21 +66,29 @@ const TaskCards = () => {
         }
     };
 
-    const handleDeleteTask = async (taskId: string) => {
-        if (!confirm('Are you sure you want to delete this task?')) return;
+    const handleDeleteTodo = (index: string) => {
+        setDeleteTaskId(index);
+        setDeletePopup(true);
+    };
 
+    const onConfirmDeleteTodo = async () => {
+        if (!deleteTaskId) return;
+        setDeleteIconLoading(true);
         try {
-            const { ok, message } = await deleteTask(taskId);
-            if (ok) {
-                toast.success(message);
-                setDeleteIconLoading(false);
-                fetchUserTasks();
+            const success = await deleteTask(deleteTaskId);
+            if (success) {
+                toast.success("Task deleted successfully!");
+                setDeletePopup(false);
+                await fetchUserTasks();
             } else {
-                console.error('Error deleting task:', message);
-                toast.error(message);
+                toast.error("Failed to delete todo.");
             }
         } catch (error) {
-            console.error('Failed to delete task:', error);
+            console.error("Error deleting todo:", error);
+        } finally {
+            setDeletePopup(false);
+            setDeleteTaskId(null);
+            setDeleteIconLoading(false);
         }
     };
 
@@ -207,7 +218,7 @@ const TaskCards = () => {
                                         <span onClick={() => handleEditClick(tasks)} className="text-gray-800 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 duration-300 cursor-pointer block mt-3 mb-4">
                                             <FiEdit3 size={20} />
                                         </span>
-                                        <Button onClick={() => handleDeleteTask(tasks?._id)} className={`text-gray-800 dark:text-white hover:text-red-500 dark:hover:text-red-500 duration-300 cursor-pointer block ${isDeleteIconLoading && 'cursor-wait opacity-50'}`} disabled={isDeleteIconLoading}>
+                                        <Button onClick={() => handleDeleteTodo(tasks?._id)} className={`text-gray-800 dark:text-white hover:text-red-500 dark:hover:text-red-500 duration-300 cursor-pointer focus:shadow-none block ${isDeleteIconLoading && 'cursor-wait opacity-50'}`} disabled={isDeleteIconLoading}>
                                             <FiTrash2 size={20} />
                                         </Button>
                                     </div>
@@ -218,6 +229,7 @@ const TaskCards = () => {
                 )}
             </BlockUI>
 
+            <DeletePopup deletePopup={deletePopup} setDeletePopup={setDeletePopup} onDelete={onConfirmDeleteTodo} deleteBtnLoading={isDeleteIconLoading} />
             <TaskDetails taskDetailsPopup={taskDetailsPopup} setTaskDetailsPopup={setTaskDetailsPopup} taskIdForDetails={taskIdForDetails} todoLengthProgress={todoLengthProgress} setTodoLengthProgress={setTodoLengthProgress} />
             <AddTaskPopup taskAddForm={taskAddForm} setTaskAddForm={setTaskAddForm} fetchTasks={fetchUserTasks} />
             <EditTaskPopup taskEditForm={taskEditForm.isOpen} setTaskEditForm={(isOpen) => setTaskEditForm({ isOpen, task: null })} fetchUserTasks={fetchUserTasks} task={taskEditForm.task} />

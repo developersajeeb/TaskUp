@@ -33,7 +33,7 @@ const Dashboard = async () => {
                 </div>
             </section>
 
-            <section className='mt-12'>
+            <section className='mt-8'>
                 <TaskTable />
             </section>
         </>

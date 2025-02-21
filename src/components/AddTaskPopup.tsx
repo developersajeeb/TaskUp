@@ -12,6 +12,7 @@ import AddCategory from './AddCategory';
 import { useSession } from 'next-auth/react';
 import { toast } from 'react-toastify';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
+import { fetchCategories } from '@/services/task';
 
 interface TaskForm {
     taskName: string;
@@ -64,14 +65,12 @@ const AddTaskPopup = ({ taskAddForm, setTaskAddForm, fetchTasks }: Props) => {
         },
     });
 
-    const fetchCategories = async () => {
+    const fetchUserCategories = async () => {
         if (!userEmail) return;
         try {
-            const res = await fetch(`/api/categories?email=${encodeURIComponent(userEmail)}`);
-            const data = await res.json();
-
-            if (data.success) {
-                const formattedCategories = data.data.map((category: string) => ({
+            const categories = await fetchCategories(userEmail);
+            if (categories && Array.isArray(categories)) {
+                const formattedCategories = categories.map((category: string) => ({
                     taskCategory: category,
                 }));
                 setTaskCategories(formattedCategories);
@@ -82,12 +81,12 @@ const AddTaskPopup = ({ taskAddForm, setTaskAddForm, fetchTasks }: Props) => {
     };
 
     useEffect(() => {
-        fetchCategories();
+        fetchUserCategories();
     }, [userEmail]);
 
     const handleCategoryAdded = () => {
         setVisibleCtgPopup(false);
-        fetchCategories();
+        fetchUserCategories();
     };
 
     const onSubmit = async (formData: TaskForm) => {

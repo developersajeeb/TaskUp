@@ -31,21 +31,21 @@ const DeletePopup = ({ deletePopup, setDeletePopup, onDelete, deleteBtnLoading }
       }}
     >
       <div className="mt-5 flex justify-end gap-4">
-        <Button
-          label="Yes"
-          disabled={deleteBtnLoading}
-          loading={deleteBtnLoading}
-          className="rounded-lg bg-red-500 px-5 py-2 text-sm text-white"
-          onClick={onDelete}
-        />
         <button
-          className="rounded-lg border bg-gray-100 px-5 py-2 text-sm font-medium text-gray-500"
+          className="rounded-lg border dark:border-gray-700 bg-gray-100 dark:bg-[#3d3d3d] px-5 py-2 text-sm font-medium text-gray-500 dark:text-white"
           onClick={() => {
             setDeletePopup(false);
           }}
         >
-          No
+          No, Keep it
         </button>
+        <Button
+          label="Yes"
+          disabled={deleteBtnLoading}
+          loading={deleteBtnLoading}
+          className="rounded-lg bg-red-500 px-5 py-2 text-sm text-white focus:shadow-none"
+          onClick={onDelete}
+        />
       </div>
     </Dialog>
   );

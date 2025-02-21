@@ -1,4 +1,5 @@
 'use client';
+import { createCategory } from '@/services/task';
 import { ErrorMessage } from '@hookform/error-message';
 import { useSession } from 'next-auth/react';
 import { Button } from 'primereact/button';
@@ -24,14 +25,10 @@ const AddCategory = ({ visibleCtgPopup, setVisibleCtgPopup, onCategoryAdded }: P
 
     const {
         register,
-        control,
         handleSubmit,
-        watch,
         setError,
         formState: { errors },
         reset,
-        clearErrors,
-        setValue
     } = useForm<CategoryFrom>({
         defaultValues: {
             categoryName: '',
@@ -41,19 +38,11 @@ const AddCategory = ({ visibleCtgPopup, setVisibleCtgPopup, onCategoryAdded }: P
     const onSubmit = async (data: CategoryFrom) => {
         setIsFormBtnLoading(true);
         try {
-            const response = await fetch('/api/categories', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    categoryName: data.categoryName.trim(),
-                    userEmail: sessionData?.data?.user?.email,
-                }),
-            });
-    
-            if (!response.ok) {
-                throw new Error(`Server error: ${response.status} ${response.statusText}`);
-            }
-    
+            const userEmail = sessionData?.data?.user?.email;
+            if (!userEmail) throw new Error('User email is missing.');
+
+            await createCategory(data.categoryName, userEmail);
+
             toast.success('Category added successfully');
             reset();
             setVisibleCtgPopup(false);

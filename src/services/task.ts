@@ -1,10 +1,10 @@
-const BASE_URL = '/api/tasks';
-const TODO_URL = '/api/todo';
+const TASK_URL = '/api/tasks';
+const CATEGORY_URL = '/api/categories';
 
 // Fetch user specific all tasks
 export const fetchTasks = async (userEmail: string) => {
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${BASE_URL}?userEmail=${encodeURIComponent(userEmail)}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${TASK_URL}?userEmail=${encodeURIComponent(userEmail)}`);
         if (!res.ok) throw new Error('Failed to fetch tasks');
         const {data} = await res.json();
         return data;
@@ -18,7 +18,7 @@ export const fetchTasks = async (userEmail: string) => {
 export const getCompletedTasks = async (userEmail: string | null) => {
     if (!userEmail) return [];
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${BASE_URL}/completed?userEmail=${encodeURIComponent(userEmail)}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${TASK_URL}/completed?userEmail=${encodeURIComponent(userEmail)}`);
 
         if (!res.ok) throw new Error("Failed to load completed tasks");
 
@@ -34,7 +34,7 @@ export const getCompletedTasks = async (userEmail: string | null) => {
 export const getIncompleteTasks = async (userEmail: string | null) => {
     if (!userEmail) return [];
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${BASE_URL}/incomplete?userEmail=${encodeURIComponent(userEmail)}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${TASK_URL}/incomplete?userEmail=${encodeURIComponent(userEmail)}`);
 
         if (!res.ok) throw new Error("Failed to load incomplete tasks");
 
@@ -49,7 +49,7 @@ export const getIncompleteTasks = async (userEmail: string | null) => {
 // Delete task
 export const deleteTask = async (taskId: string) => {
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${BASE_URL}/${taskId}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${TASK_URL}/${taskId}`, {
             method: 'DELETE',
         });
         const data = await res.json();
@@ -64,64 +64,47 @@ export const deleteTask = async (taskId: string) => {
 // Fetch task details
 export const fetchTaskDetails = async (taskId: string) => {
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${BASE_URL}/${taskId}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${TASK_URL}/${taskId}`);
         if (!res.ok) throw new Error('Failed to fetch task details');
-        const data = await res.json();
-        return data?.data;
+        const {data} = await res.json();
+        return data;
     } catch (error) {
         console.error("Error fetching task details:", error);
         throw error;
     }
 };
 
-// Add a new todo
-export const addTodo = async (taskId: string, todoName: string) => {
+// Get user specific categories
+export const fetchCategories = async (userEmail: string) => {
     try {
-        const newTodo = { workDone: false, todoName };
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${TODO_URL}/${taskId}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ todoList: [newTodo] }),
-        });
-        const result = await res.json();
-        if (!res.ok) throw new Error(result.message || 'Failed to add todo');
-        return result;
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${CATEGORY_URL}?email=${encodeURIComponent(userEmail)}`);
+        if (!res.ok) throw new Error('Failed to fetch categories');
+        const { data } = await res.json();
+        return data;
     } catch (error) {
-        console.error('Error adding todo:', error);
+        console.error("Error fetching categories:", error);
         throw error;
     }
 };
 
-// Update todo status
-export const updateTodoStatus = async (taskId: string, index: number, workDone: boolean) => {
+// Create a new category
+export const createCategory = async (categoryName: string, userEmail: string) => {
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${TODO_URL}/${taskId}`, {
-            method: 'PATCH',
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${CATEGORY_URL}`, {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ updateWorkDone: { todoIndex: index, workDone } }),
+            body: JSON.stringify({ categoryName: categoryName.trim(), userEmail }),
         });
-        const result = await res.json();
-        if (!res.ok) throw new Error(result.message || 'Failed to update todo status');
-        return result;
-    } catch (error) {
-        console.error('Error updating todo status:', error);
-        throw error;
-    }
-};
 
-// Delete a todo
-export const deleteTodo = async (taskId: string, index: number) => {
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${TODO_URL}/${taskId}`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ todoIndex: index }),
-        });
-        const result = await res.json();
-        if (!res.ok) throw new Error(result.message || 'Failed to delete todo');
-        return result;
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || 'Failed to create category');
+        }
+
+        const data = await res.json();
+        return data;
     } catch (error) {
-        console.error('Error deleting todo:', error);
+        console.error('Error creating category:', error);
         throw error;
     }
 };
