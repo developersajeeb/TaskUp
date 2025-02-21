@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Paginator } from 'primereact/paginator';
-import Link from 'next/link';
 import { IoEyeOutline } from 'react-icons/io5';
 import TaskDetails from '@/components/TaskDetails';
 import { toast } from 'react-toastify';
@@ -13,6 +12,8 @@ import { FiEdit3, FiTrash2 } from 'react-icons/fi';
 import EditTaskPopup from '@/components/EditTaskPopup';
 import { useSession } from 'next-auth/react';
 import TableLoader from './TableLoader';
+import { deleteTask, fetchTasks } from '@/services/task';
+import DeletePopup from './DeletePoup';
 
 interface TodoItem {
     workDone: boolean;
@@ -53,8 +54,10 @@ const TaskTable = () => {
     const rowsPerPage = 5;
     const [taskDetailsPopup, setTaskDetailsPopup] = useState<boolean>(false);
     const [taskIdForDetails, setTaskIdForDetails] = useState<string | null>(null);
-    const [taskDetails, setTaskDetails] = useState<TaskDetailsProps | null>(null);
+    const [todoLengthProgress, setTodoLengthProgress] = useState<TaskDetailsProps | null>(null);
     const [isDeleteIconLoading, setDeleteIconLoading] = useState<boolean>(false);
+    const [deletePopup, setDeletePopup] = useState<boolean>(false);
+    const [deleteTaskId, setDeleteTaskId] = useState<string | null>(null);
     const [taskEditForm, setTaskEditForm] = useState<{ isOpen: boolean; task: any }>({
         isOpen: false,
         task: null,
@@ -64,47 +67,48 @@ const TaskTable = () => {
         setFirst((currentPage - 1) * rowsPerPage);
     }, [currentPage]);
 
-    const fetchTasks = async () => {
+    const fetchUserTasks = async () => {
         seIsLoading(true);
         if (!userEmail) return;
         try {
-            const res = await fetch(`/api/tasks?userEmail=${encodeURIComponent(userEmail)}`);
-            const data = await res.json();
-            setTaskList(data?.data);
-            seIsLoading(false);
+            const data = await fetchTasks(userEmail);
+            setTaskList(data || []);
         } catch (error) {
-            console.error("Error fetching tasks:", error);
+            console.error('Failed to load tasks:', error);
+        } finally {
+            seIsLoading(false);
         }
     };
 
     useEffect(() => {
         if (userEmail) {
-            fetchTasks();
+            fetchUserTasks();
         }
     }, [userEmail]);
 
-    const handleDeleteTask = async (taskId: string) => {
+    const handleDeleteTodo = (index: string) => {
+        setDeleteTaskId(index);
+        setDeletePopup(true);
+    };
+
+    const onConfirmDeleteTodo = async () => {
+        if (!deleteTaskId) return;
         setDeleteIconLoading(true);
         try {
-            const response = await fetch(`/api/tasks/${taskId}`, {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id: taskId }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                toast.success(data.message);
-                setDeleteIconLoading(false);
-                setTaskList(prevTasks => prevTasks.filter(task => task._id !== taskId));
+            const success = await deleteTask(deleteTaskId);
+            if (success) {
+                toast.success("Task deleted successfully!");
+                setDeletePopup(false);
+                await fetchUserTasks();
             } else {
-                console.error("Error deleting task:", data.message);
-                toast.error(data.message);
+                toast.error("Failed to delete todo.");
             }
-        } catch (error: any) {
-            console.error("Error deleting task:", error);
-            toast.error("Failed to delete task");
+        } catch (error) {
+            console.error("Error deleting todo:", error);
+        } finally {
+            setDeletePopup(false);
+            setDeleteTaskId(null);
+            setDeleteIconLoading(false);
         }
     };
 
@@ -194,7 +198,11 @@ const TaskTable = () => {
                             header="Status"
                             className="tu-table-column w-[130px]"
                             body={(item: Task) => {
-                                const isCompleted = item?.todoList?.length > 0 && item.todoList.every(todo => todo.workDone);
+                                const isCurrentTask = todoLengthProgress?._id === item._id;
+                                const isCompleted = isCurrentTask
+                                    ? todoLengthProgress?.todoList?.every(todo => todo.workDone)
+                                    : item?.todoList?.every(todo => todo.workDone);
+
                                 const status = isCompleted ? "Completed" : "In Progress";
 
                                 return (
@@ -212,7 +220,7 @@ const TaskTable = () => {
                                     <span onClick={() => { setTaskDetailsPopup(true), setTaskIdForDetails(item._id) }} className="text-blue-500 hover:text-[#004A95] duration-300 cursor-pointer inline-block">
                                         <IoEyeOutline size={20} />
                                     </span>
-                                    <Button onClick={() => handleDeleteTask(item?._id)} className={`text-red-500 hover:text-red-600 dark:hover:text-red-600 duration-300 cursor-pointer inline-block ${isDeleteIconLoading && 'cursor-wait opacity-50'}`} disabled={isDeleteIconLoading}>
+                                    <Button onClick={() => handleDeleteTodo(item?._id)} className={`text-red-500 hover:text-red-600 dark:hover:text-red-600 duration-300 cursor-pointer inline-block ${isDeleteIconLoading && 'cursor-wait opacity-50'}`} disabled={isDeleteIconLoading}>
                                         <FiTrash2 size={18} />
                                     </Button>
                                     <span onClick={() => handleEditClick(item)} className="text-blue-500 hover:text-[#004A95] duration-300 cursor-pointer inline-block">
@@ -233,8 +241,9 @@ const TaskTable = () => {
                     />
                 </>
             )}
-            <TaskDetails taskDetailsPopup={taskDetailsPopup} setTaskDetailsPopup={setTaskDetailsPopup} taskIdForDetails={taskIdForDetails} taskDetails={taskDetails} setTaskDetails={setTaskDetails} />
-            <EditTaskPopup taskEditForm={taskEditForm.isOpen} setTaskEditForm={(isOpen) => setTaskEditForm({ isOpen, task: null })} fetchTasks={fetchTasks} task={taskEditForm.task} />
+            <DeletePopup deletePopup={deletePopup} setDeletePopup={setDeletePopup} onDelete={onConfirmDeleteTodo} deleteBtnLoading={isDeleteIconLoading} />
+            <TaskDetails taskDetailsPopup={taskDetailsPopup} setTaskDetailsPopup={setTaskDetailsPopup} taskIdForDetails={taskIdForDetails} todoLengthProgress={todoLengthProgress} setTodoLengthProgress={setTodoLengthProgress} />
+            <EditTaskPopup taskEditForm={taskEditForm.isOpen} setTaskEditForm={(isOpen) => setTaskEditForm({ isOpen, task: null })} fetchUserTasks={fetchUserTasks} task={taskEditForm.task} />
         </div>
     );
 };

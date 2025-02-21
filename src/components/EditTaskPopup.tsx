@@ -27,7 +27,7 @@ interface TaskCategory {
 interface Props {
     taskEditForm: boolean;
     setTaskEditForm: (value: boolean) => void;
-    fetchTasks: () => void;
+    fetchUserTasks: () => void;
     task: any;
 }
 
@@ -35,7 +35,7 @@ interface TaskPriority {
     name: string;
 }
 
-const EditTaskPopup = ({ taskEditForm, setTaskEditForm, fetchTasks, task }: Props) => {
+const EditTaskPopup = ({ taskEditForm, setTaskEditForm, fetchUserTasks, task }: Props) => {
     const [isFormBtnLoading, setIsFormBtnLoading] = useState<boolean>(false);
     const [selectedCategories, setSelectedCategories] = useState<TaskCategory[]>([]);
     const [visibleCtgPopup, setVisibleCtgPopup] = useState<boolean>(false);
@@ -123,7 +123,7 @@ const EditTaskPopup = ({ taskEditForm, setTaskEditForm, fetchTasks, task }: Prop
                 setTaskEditForm(false);
                 setTaskPriority(null);
                 setSelectedCategories([]);
-                fetchTasks();
+                fetchUserTasks();
             } else {
                 toast.error(data.message || "Something went wrong!");
             }

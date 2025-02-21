@@ -17,6 +17,7 @@ import NoTask from '../../../../public/images/no-task.png';
 import Image from 'next/image';
 import EditTaskPopup from '@/components/EditTaskPopup';
 import TaskDetails from '@/components/TaskDetails';
+import { deleteTask, fetchTasks } from '@/services/task';
 
 interface TodoItem {
     workDone: boolean;
@@ -38,7 +39,7 @@ const TaskCards = () => {
     const [taskDetailsPopup, setTaskDetailsPopup] = useState<boolean>(false);
     const { data } = useSession();
     const userEmail = data?.user?.email;
-    const [allTasks, setAllTasks] = useState<{ data: any[] } | null>(null);
+    const [allTasks, setAllTasks] = useState<TaskDetailsProps[] | null>(null);
     const [isDataLoading, setDataLoading] = useState<boolean>(true);
     const [activeOverlay, setActiveOverlay] = useState<string | null>(null);
     const [isDeleteIconLoading, setDeleteIconLoading] = useState<boolean>(false);
@@ -47,53 +48,44 @@ const TaskCards = () => {
         isOpen: false,
         task: null,
     });
-    const [taskDetails, setTaskDetails] = useState<TaskDetailsProps | null>(null);
+    const [todoLengthProgress, setTodoLengthProgress] = useState<TaskDetailsProps | null>(null);
 
-    const fetchTasks = async () => {
+    const fetchUserTasks = async () => {
         if (!userEmail) return;
-
         setDataLoading(true);
         try {
-            const res = await fetch(`/api/tasks?userEmail=${encodeURIComponent(userEmail)}`);
-            const data = await res.json();
-            setAllTasks(data);
-            setDataLoading(false);
+            const data = await fetchTasks(userEmail);
+            setAllTasks(data || []);
         } catch (error) {
-            console.error("Error fetching tasks:", error);
+            console.error('Failed to load tasks:', error);
+        } finally {
             setDataLoading(false);
+        }
+    };
+
+    const handleDeleteTask = async (taskId: string) => {
+        if (!confirm('Are you sure you want to delete this task?')) return;
+
+        try {
+            const { ok, message } = await deleteTask(taskId);
+            if (ok) {
+                toast.success(message);
+                setDeleteIconLoading(false);
+                fetchUserTasks();
+            } else {
+                console.error('Error deleting task:', message);
+                toast.error(message);
+            }
+        } catch (error) {
+            console.error('Failed to delete task:', error);
         }
     };
 
     useEffect(() => {
         if (userEmail) {
-            fetchTasks();
+            fetchUserTasks();
         }
-    }, [userEmail]);    
-
-    const handleDeleteTask = async (taskId: string) => {
-        setDeleteIconLoading(true);
-        try {
-            const response = await fetch(`/api/tasks/${taskId}`, {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id: taskId }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                toast.success(data.message);
-                setDeleteIconLoading(false);
-                fetchTasks();
-            } else {
-                console.error("Error deleting task:", data.message);
-                toast.error(data.message);
-            }
-        } catch (error: any) {
-            console.error("Error deleting task:", error);
-            toast.error("Failed to delete task");
-        }
-    };
+    }, [userEmail]);
 
     const toggleOverlay = (taskId: string) => {
         setActiveOverlay((prev) => (prev === taskId ? null : taskId));
@@ -136,7 +128,7 @@ const TaskCards = () => {
                     />
                 </section>
 
-                {allTasks?.data?.length === 0 ? (
+                {allTasks?.length === 0 ? (
                     <div className='flex justify-center items-center h-[calc(100vh-180px)]'>
                         <div>
                             <Image className='w-full max-w-24 mx-auto' src={NoTask} height='150' width='50' alt='No task' />
@@ -145,7 +137,7 @@ const TaskCards = () => {
                     </div>
                 ) : (
                     <section className="grid md:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-7 mt-10">
-                        {allTasks?.data?.map((tasks: any) => {
+                        {allTasks?.map((tasks: any) => {
 
                             return (
                                 <div key={tasks._id} className={`bg-[#dbe8f5] dark:bg-[#36516c] p-5 rounded-xl border-2 border-[#cfe2f5] dark:border-[#486480] relative overflow-hidden`}>
@@ -177,8 +169,8 @@ const TaskCards = () => {
                                                 Progress
                                             </p>
                                             <p className="text-xs font-medium text-gray-600 dark:text-gray-100">
-                                                {taskDetails?._id === tasks?._id && taskDetails?.todoList
-                                                    ? `${taskDetails.todoList.filter((todo: { workDone: boolean }) => todo.workDone).length}/${taskDetails.todoList.length}`
+                                                {todoLengthProgress?._id === tasks?._id && todoLengthProgress?.todoList
+                                                    ? `${todoLengthProgress.todoList.filter((todo: { workDone: boolean }) => todo.workDone).length}/${todoLengthProgress.todoList.length}`
                                                     : tasks?.todoList
                                                         ? `${tasks.todoList.filter((task: { workDone: boolean }) => task.workDone).length}/${tasks.todoList.length}`
                                                         : "0/0"}
@@ -187,12 +179,12 @@ const TaskCards = () => {
                                         <ProgressBar
                                             className="text-xs bg-white dark:bg-gray-200 h-3"
                                             value={Math.round(
-                                                ((taskDetails?.todoList && taskDetails?._id === tasks?._id
-                                                    ? taskDetails.todoList.filter((todo: { workDone: boolean }) => todo.workDone).length
+                                                ((todoLengthProgress?.todoList && todoLengthProgress?._id === tasks?._id
+                                                    ? todoLengthProgress.todoList.filter((todo: { workDone: boolean }) => todo.workDone).length
                                                     : tasks?.todoList?.filter((task: { workDone: boolean }) => task.workDone).length || 0
                                                 ) /
-                                                    ((taskDetails?.todoList && taskDetails?._id === tasks?._id
-                                                        ? taskDetails.todoList.length
+                                                    ((todoLengthProgress?.todoList && todoLengthProgress?._id === tasks?._id
+                                                        ? todoLengthProgress.todoList.length
                                                         : tasks?.todoList?.length) || 1)) * 100
                                             )}
                                         >
@@ -226,9 +218,9 @@ const TaskCards = () => {
                 )}
             </BlockUI>
 
-            <TaskDetails taskDetailsPopup={taskDetailsPopup} setTaskDetailsPopup={setTaskDetailsPopup} taskIdForDetails={taskIdForDetails} taskDetails={taskDetails} setTaskDetails={setTaskDetails} />
-            <AddTaskPopup taskAddForm={taskAddForm} setTaskAddForm={setTaskAddForm} fetchTasks={fetchTasks} />
-            <EditTaskPopup taskEditForm={taskEditForm.isOpen} setTaskEditForm={(isOpen) => setTaskEditForm({ isOpen, task: null })} fetchTasks={fetchTasks} task={taskEditForm.task} />
+            <TaskDetails taskDetailsPopup={taskDetailsPopup} setTaskDetailsPopup={setTaskDetailsPopup} taskIdForDetails={taskIdForDetails} todoLengthProgress={todoLengthProgress} setTodoLengthProgress={setTodoLengthProgress} />
+            <AddTaskPopup taskAddForm={taskAddForm} setTaskAddForm={setTaskAddForm} fetchTasks={fetchUserTasks} />
+            <EditTaskPopup taskEditForm={taskEditForm.isOpen} setTaskEditForm={(isOpen) => setTaskEditForm({ isOpen, task: null })} fetchUserTasks={fetchUserTasks} task={taskEditForm.task} />
         </>
     );
 };

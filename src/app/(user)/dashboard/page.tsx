@@ -4,74 +4,19 @@ import TaskNumberOverview from './TaskNumberOverview';
 import { getServerSession } from 'next-auth';
 import { Skeleton } from 'primereact/skeleton';
 import TaskTable from '@/components/TaskTable';
+import { fetchTasks, getCompletedTasks, getIncompleteTasks } from '@/services/task';
 
 export const metadata = {
     title: "Dashboard - TaskUp",
 };
 
-const getTasks = async (userEmail: string | null) => {
-    if (!userEmail) return [];
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/tasks?userEmail=${encodeURIComponent(userEmail)}`, {
-            cache: 'no-store',
-        });
-
-        if (!res.ok) {
-            throw new Error("Failed to load data");
-        }
-
-        const { data } = await res.json();
-        return data;
-    } catch (error) {
-        console.error("Error:", error);
-        return [];
-    }
-};
-
-const getCompletedTasks = async (userEmail: string | null) => {
-    if (!userEmail) return [];
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/tasks/completed?userEmail=${encodeURIComponent(userEmail)}`, {
-            cache: 'no-store',
-        });
-
-        if (!res.ok) {
-            throw new Error("Failed to load data");
-        }
-
-        const { data } = await res.json();
-        return data;
-    } catch (error) {
-        console.error("Error:", error);
-        return [];
-    }
-};
-
-const getIncompleteTasks = async (userEmail: string | null) => {
-    if (!userEmail) return [];
-    try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/tasks/incomplete?userEmail=${encodeURIComponent(userEmail)}`, {
-            cache: 'no-store',
-        });
-
-        if (!res.ok) {
-            throw new Error("Failed to load data");
-        }
-
-        const { data } = await res.json();
-        return data;
-    } catch (error) {
-        console.error("Error:", error);
-        return [];
-    }
-};
-
 const Dashboard = async () => {
     const session = await getServerSession();
     const userEmail = session?.user?.email || null;
-    const tasks = await getTasks(userEmail);
-    const completeTasks = await getCompletedTasks(userEmail);
-    const incompleteTasks = await getIncompleteTasks(userEmail);
+
+    const tasks = userEmail ? await fetchTasks(userEmail) : [];
+    const completeTasks = userEmail ? await getCompletedTasks(userEmail) : [];
+    const incompleteTasks = userEmail ? await getIncompleteTasks(userEmail) : [];
 
     return (
         <>

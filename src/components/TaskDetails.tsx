@@ -11,13 +11,14 @@ import { FiTrash2 } from 'react-icons/fi';
 import { LuListTree } from 'react-icons/lu';
 import { toast } from 'react-toastify';
 import DeletePopup from './DeletePoup';
+import { addTodo, deleteTodo, fetchTaskDetails, updateTodoStatus } from '@/services/task';
 
 interface Props {
     taskDetailsPopup: boolean;
     setTaskDetailsPopup: (value: boolean) => void;
     taskIdForDetails: string | null;
-    taskDetails: TaskDetailsProps | null;
-    setTaskDetails: (value: TaskDetailsProps | null) => void;
+    todoLengthProgress: TaskDetailsProps | null;
+    setTodoLengthProgress: (value: TaskDetailsProps | null) => void;
 }
 
 interface TodoItem {
@@ -38,8 +39,7 @@ interface TaskDetailsProps {
 interface TodoListContent {
     todoListDetails: string;
 }
-
-const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails, taskDetails, setTaskDetails }: Props) => {
+const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails, todoLengthProgress, setTodoLengthProgress }: Props) => {
     const [isDataLoading, setDataLoading] = useState<boolean>(true);
     const [isFormBtnLoading, setIsFormBtnLoading] = useState<boolean>(false);
     const [addTodoList, setAddTodoList] = useState<boolean>(false);
@@ -47,30 +47,26 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails, 
     const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
 
     const fetchTasksDetails = async () => {
-        if (!taskIdForDetails) {
-            return;
-        }
-
+        if (!taskIdForDetails) return;
         setDataLoading(true);
         try {
-            const res = await fetch(`/api/tasks/${taskIdForDetails}`);
-            const data = await res.json();
-            setTaskDetails(data?.data);
+            const data = await fetchTaskDetails(taskIdForDetails);
+            setTodoLengthProgress(data);
         } catch (error) {
             console.error("Error fetching task:", error);
         } finally {
             setDataLoading(false);
         }
-    };
+    };    
     useEffect(() => {
         fetchTasksDetails();
     }, [taskIdForDetails, taskDetailsPopup]);
 
     const customHeader = () => {
         return (
-            <p>{taskDetails?.taskName || '---'}
-                {taskDetails?.priority !== null &&
-                    <span className={`text-white font-medium text-xs ml-2 py-1 px-2 rounded-lg ${taskDetails?.priority === 'Low' && 'bg-gray-400' || taskDetails?.priority === 'Medium' && 'bg-yellow-500' || taskDetails?.priority === 'High' && 'bg-red-500'}`}>{taskDetails?.priority}</span>
+            <p>{todoLengthProgress?.taskName || '---'}
+                {todoLengthProgress?.priority !== null &&
+                    <span className={`text-white font-medium text-xs ml-2 py-1 px-2 rounded-lg ${todoLengthProgress?.priority === 'Low' && 'bg-gray-400' || todoLengthProgress?.priority === 'Medium' && 'bg-yellow-500' || todoLengthProgress?.priority === 'High' && 'bg-red-500'}`}>{todoLengthProgress?.priority}</span>
                 }
             </p>
         )
@@ -89,60 +85,41 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails, 
 
     const handleAddTodo = async (data: TodoListContent) => {
         if (!taskIdForDetails) return;
-
         setIsFormBtnLoading(true);
         try {
-            const newTodo = {
-                workDone: false,
-                todoName: data.todoListDetails,
-            };
-            const response = await fetch(`/api/todo/${taskIdForDetails}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ todoList: [newTodo] }),
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
+            const success = await addTodo(taskIdForDetails, data.todoListDetails);
+            if (success) {
                 toast.success("Todo added successfully!");
                 setAddTodoList(false);
                 reset();
                 await fetchTasksDetails();
             } else {
-                toast.error("Failed to add todo:", result.message);
+                toast.error("Failed to add todo.");
             }
         } catch (error) {
             console.error("Error adding todo:", error);
         } finally {
             setIsFormBtnLoading(false);
         }
-    };
+    };    
 
     const handleCheckboxClick = async (index: number, checked: boolean) => {
         setDataLoading(true);
         if (!taskIdForDetails) return;
-
         try {
-            const response = await fetch(`/api/todo/${taskIdForDetails}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ updateWorkDone: { todoIndex: index, workDone: checked } }),
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
+            const success = await updateTodoStatus(taskIdForDetails, index, checked);
+            if (success) {
                 toast.success("Todo status updated successfully!");
-                setDataLoading(false);
                 await fetchTasksDetails();
             } else {
                 toast.error("Failed to update todo status.");
             }
         } catch (error) {
             console.error("Error updating todo status:", error);
+        } finally {
+            setDataLoading(false);
         }
-    };
+    };    
 
     const handleDeleteTodo = (index: number) => {
         setDeleteIndex(index);
@@ -151,18 +128,10 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails, 
 
     const onConfirmDeleteTodo = async () => {
         if (!taskIdForDetails || deleteIndex === null) return;
-
         setDataLoading(true);
         try {
-            const response = await fetch(`/api/todo/${taskIdForDetails}`, {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ todoIndex: deleteIndex }),
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
+            const success = await deleteTodo(taskIdForDetails, deleteIndex);
+            if (success) {
                 toast.success("Todo deleted successfully!");
                 await fetchTasksDetails();
             } else {
@@ -170,13 +139,12 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails, 
             }
         } catch (error) {
             console.error("Error deleting todo:", error);
-            toast.error("An error occurred while deleting.");
         } finally {
             setDeletePopup(false);
             setDeleteIndex(null);
             setDataLoading(false);
         }
-    };
+    };    
 
     return (
         <Dialog header={customHeader} visible={taskDetailsPopup} className='w-full max-w-[750px] mx-4 z-[70]' onHide={() => setTaskDetailsPopup(false)}>
@@ -188,17 +156,17 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails, 
                 </div>
             }>
                 <div className='pt-6 overflow-hidden'>
-                    {taskDetails?.description ? (
+                    {todoLengthProgress?.description ? (
                         <>
                             <h5 className='text-gray-800 dark:text-white font-medium mb-2'>Description:</h5>
-                            <p className='text-gray-800 dark:text-gray-200 text-sm'>{taskDetails?.description}</p>
+                            <p className='text-gray-800 dark:text-gray-200 text-sm'>{todoLengthProgress?.description}</p>
                         </>
                     ) : (
                         <p className='text-gray-600 dark:text-gray-200 text-center'>No description here!</p>
                     )}
 
-                    {taskDetails?.dueDate && (
-                        <p className='text-gray-800 dark:text-white text-sm mt-4'> <span className='font-semibold text-red-500'>Due Date:</span> {new Date(taskDetails.dueDate).toLocaleDateString('en-US', {
+                    {todoLengthProgress?.dueDate && (
+                        <p className='text-gray-800 dark:text-white text-sm mt-4'> <span className='font-semibold text-red-500'>Due Date:</span> {new Date(todoLengthProgress.dueDate).toLocaleDateString('en-US', {
                             weekday: 'long',
                             year: 'numeric',
                             month: 'long',
@@ -206,10 +174,10 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails, 
                         })}</p>
                     )}
 
-                    {taskDetails?.taskCategory && taskDetails?.taskCategory?.length > 0 && (
+                    {todoLengthProgress?.taskCategory && todoLengthProgress?.taskCategory?.length > 0 && (
                         <div className="flex flex-wrap gap-2 mt-8">
-                            {taskDetails?.taskCategory?.map((taskCtg: any, index: number) => (
-                                <span key={`${taskDetails?._id}-${index}`} className="inline-block rounded-lg px-3 py-2 bg-[#9C82F8] text-xs font-medium text-white">
+                            {todoLengthProgress?.taskCategory?.map((taskCtg: any, index: number) => (
+                                <span key={`${todoLengthProgress?._id}-${index}`} className="inline-block rounded-lg px-3 py-2 bg-[#9C82F8] text-xs font-medium text-white">
                                     {taskCtg}
                                 </span>
                             ))}
@@ -221,8 +189,8 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails, 
                     <button className='primary-btn flex items-center gap-2' onClick={() => setAddTodoList(true)}>Add Todo List <LuListTree size={16} /></button>
 
                     <ul className='grid gap-5 mt-10'>
-                        {taskDetails?.todoList && taskDetails.todoList.length > 0 ? (
-                            taskDetails.todoList.map((todo: any, index: number) => (
+                        {todoLengthProgress?.todoList && todoLengthProgress.todoList.length > 0 ? (
+                            todoLengthProgress.todoList.map((todo: any, index: number) => (
                                 <li key={index} className={`flex flex-col md:flex-row gap-3 bg-gray-100 dark:bg-[#303030] p-4 md:p-5 rounded-lg border-2 border-gray-200 dark:border-[#484848] relative ${todo.workDone ? 'line-through opacity-50' : ''}`}>
                                     <Checkbox
                                         onChange={e => handleCheckboxClick(index, e.checked ?? false)}
