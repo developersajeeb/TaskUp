@@ -13,7 +13,7 @@ import { FaEye } from 'react-icons/fa';
 import { BlockUI } from 'primereact/blockui';
 import CommonLoader from '@/components/CommonLoader';
 import { toast } from 'react-toastify';
-import NoTask from '../../../../public/images/no-task.png';
+import NoTask from '../../../../public/images/no-task.svg';
 import Image from 'next/image';
 import EditTaskPopup from '@/components/EditTaskPopup';
 import TaskDetails from '@/components/TaskDetails';
@@ -142,8 +142,8 @@ const TaskCards = () => {
                 {allTasks?.length === 0 ? (
                     <div className='flex justify-center items-center h-[calc(100vh-180px)]'>
                         <div>
-                            <Image className='w-full max-w-24 mx-auto' src={NoTask} height='150' width='50' alt='No task' />
-                            <p className='text-gray-600 dark:text-gray-100 text-center mt-4 font-semibold text-xl'>No Task Available!</p>
+                            <Image className='w-full max-w-[300px] mx-auto' src={NoTask} height='150' width='50' alt='No task' />
+                            <p className='text-gray-600 dark:text-gray-100 text-center font-medium text-xl'>No Task Available!</p>
                         </div>
                     </div>
                 ) : (

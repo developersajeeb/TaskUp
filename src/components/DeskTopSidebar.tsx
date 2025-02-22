@@ -11,7 +11,7 @@ import { TbCategory2 } from 'react-icons/tb';
 const DeskTopSidebar = () => {
     const pathname = usePathname();
     return (
-        <aside className='bg-[#fefefe] dark:bg-[#1B1B1B] p-5 border-r border-gray-300 dark:border-[#2d2d2d] w-full max-w-[250px] fixed z-50 top-0 left-0 bottom-0 hidden lg:block duration-100 ease-in-out'>
+        <aside className='bg-[#f9f9f9] dark:bg-[#1B1B1B] p-5 border-r border-gray-300 dark:border-[#2d2d2d] w-full max-w-[250px] fixed z-50 top-0 left-0 bottom-0 hidden lg:block duration-100 ease-in-out'>
             <Link href='/'>
                 <Image className={`w-[130px] md:w-[160px] mx-auto`} src={Logo} alt='Logo' width={180} height={80} />
             </Link>

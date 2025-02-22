@@ -1,5 +1,6 @@
 const TASK_URL = '/api/tasks';
 const CATEGORY_URL = '/api/categories';
+const CATEGORY_SEARCH_URL = '/api/categories/search';
 
 // Fetch user specific all tasks
 export const fetchTasks = async (userEmail: string) => {
@@ -106,5 +107,33 @@ export const createCategory = async (categoryName: string, userEmail: string) =>
     } catch (error) {
         console.error('Error creating category:', error);
         throw error;
+    }
+};
+
+// Fetch user-specific categories with search functionality
+export const searchCategories = async (userEmail: string, searchQuery: string = '') => {
+    if (!userEmail) return [];
+    try {
+        const queryParam = searchQuery ? `&query=${encodeURIComponent(searchQuery)}` : '';
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${CATEGORY_SEARCH_URL}?email=${encodeURIComponent(userEmail)}${queryParam}`);
+        if (!res.ok) throw new Error('Failed to fetch categories');
+        const { data } = await res.json();
+        return Array.isArray(data) ? data.map((category: string) => ({ taskCategory: category })) : [];
+    } catch (error) {
+        console.error("Error fetching user categories:", error);
+        return [];
+    }
+};
+
+// Category Delete Function
+export const deleteCategory = async (email: string, index: number) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${CATEGORY_URL}?email=${email}&index=${index}`, {
+            method: 'DELETE',
+        });
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to delete category:', error);
+        return null;
     }
 };
