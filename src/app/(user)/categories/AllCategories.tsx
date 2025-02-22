@@ -30,32 +30,6 @@ const AllCategories = () => {
     const { register, handleSubmit, watch } = useForm();
     const searchQuery = watch('searchQuery');
 
-    // const fetchUserCategories = async () => {
-    //     if (!userEmail) return;
-
-    //     setDataLoading(true);
-
-    //     try {
-    //         const queryParam = searchQuery ? `&query=${encodeURIComponent(searchQuery)}` : '';
-    //         const res = await fetch(`/api/categories/search?email=${encodeURIComponent(userEmail)}${queryParam}`);
-
-    //         if (!res.ok) throw new Error('Failed to fetch categories');
-
-    //         const { data } = await res.json();
-
-    //         const formattedCategories = Array.isArray(data)
-    //             ? data.map((category: string) => ({ taskCategory: category }))
-    //             : [];
-
-    //         setTaskCategories(formattedCategories);
-    //     } catch (error) {
-    //         console.error("Error fetching categories:", error);
-    //         setTaskCategories([]);
-    //     } finally {
-    //         setDataLoading(false);
-    //     }
-    // };
-
     const fetchUserCategories = async () => {
         if (!userEmail) return;
 
