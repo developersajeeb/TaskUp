@@ -1,16 +1,40 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { Chart } from 'primereact/chart';
+import { useSession } from 'next-auth/react';
+import { fetchTasks, getCompletedTasks, getIncompleteTasks } from '@/services/task';
+import { Skeleton } from 'primereact/skeleton';
 
-interface Props {
-    tasks: [];
-    completeTasks: [];
-    incompleteTasks: [];
-}
-
-const TotalTaskGraph = ({ tasks, completeTasks, incompleteTasks }: Props) => {
+const TotalTaskGraph = () => {
     const [chartData, setChartData] = useState({});
     const [chartOptions, setChartOptions] = useState({});
+    const { data: session } = useSession();
+    const userEmail = session?.user?.email;
+    const [tasks, setTasks] = useState<[]>([]);
+    const [completeTasks, setCompleteTasks] = useState<[]>([]);
+    const [incompleteTasks, setIncompleteTasks] = useState<[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+
+    useEffect(() => {
+        const loadTasks = async () => {
+            setIsLoading(true);
+            if (userEmail) {
+                try {
+                    const allTasks = await fetchTasks(userEmail);
+                    const completed = await getCompletedTasks(userEmail);
+                    const incomplete = await getIncompleteTasks(userEmail);
+                    setTasks(allTasks);
+                    setCompleteTasks(completed);
+                    setIncompleteTasks(incomplete);
+                    setIsLoading(false);
+                } catch (error) {
+                    console.error('Failed to fetch tasks:', error);
+                }
+            }
+        };
+
+        loadTasks();
+    }, [userEmail]);
 
     useEffect(() => {
         const colors = {
@@ -37,15 +61,18 @@ const TotalTaskGraph = ({ tasks, completeTasks, incompleteTasks }: Props) => {
 
         setChartData(data);
         setChartOptions(options);
-    }, []);
+    }, [tasks, completeTasks, incompleteTasks]);
 
     return (
         <>
-            {tasks?.length === 0 && completeTasks?.length === 0 && incompleteTasks?.length === 0 ? (
-                <div className='text-gray-800 dark:text-white h-full flex items-center justify-center'><p>No Data Available.</p></div>
-            ) : (
-                <Chart type="doughnut" data={chartData} options={chartOptions} className="max-w-[262px] w-full mx-auto" />
-            )}
+            {isLoading ?
+                (<Skeleton width="100%" height="262px" className='dark:bg-[#1a1a1a] rounded-xl'></Skeleton>) : (
+                    tasks?.length === 0 && completeTasks?.length === 0 && incompleteTasks?.length === 0 ? (
+                        <div className='text-gray-800 dark:text-white h-[296px] flex items-center justify-center'><p>No Data Available.</p></div>
+                    ) : (
+                        <Chart type="doughnut" data={chartData} options={chartOptions} className="max-w-[262px] w-full mx-auto" />
+                    )
+                )}
         </>
     );
 };

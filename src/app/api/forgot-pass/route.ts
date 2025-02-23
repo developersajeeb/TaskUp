@@ -5,6 +5,7 @@ import clientPromise from "@/lib/mongodb";
 
 export async function POST(req: Request) {
     try {
+        const currentTime = new Date().toISOString();
         const { email } = await req.json();
 
         if (!email) {
@@ -22,9 +23,9 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
-        // Generate token
+        // Generate token and expiry time
         const resetToken = crypto.randomBytes(20).toString("hex");
-        const tokenExpiry = new Date(Date.now() + 3600000); // 1-hour expiry
+        const tokenExpiry = new Date(new Date().getTime() + 3600000).toISOString(); // 1-hour expiry
 
         // Update user with reset token and expiry
         await usersCollection.updateOne(
@@ -46,7 +47,13 @@ export async function POST(req: Request) {
             from: process.env.EMAIL_USER,
             to: email,
             subject: "Password Reset",
-            html: `<p>Click the link to reset your password: <a href="${resetLink}">${resetLink}</a></p><br><p>Expire in 1 hour!</p>`,
+            html: `
+                <p>Hello,</p>
+                <p>Click the link below to reset your password:</p>
+                <p><a href="${resetLink}">${resetLink}</a></p>
+                <p>This link will expire in 1 hour.</p>
+                <p>Current Server Time: ${currentTime}</p>
+            `,
         });
 
         return NextResponse.json({ message: "Password reset email sent!" }, { status: 200 });

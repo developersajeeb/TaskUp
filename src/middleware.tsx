@@ -7,7 +7,7 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Allow public access to specific routes
-  const publicRoutes = ["/login", "/signup", "/forgot-password", "/new-password"];
+  const publicRoutes = ["/login", "/signup", "/forgot-password", "/new-password", "/not-found"];
   if (publicRoutes.some(route => pathname.startsWith(route))) {
     if (token) {
       return NextResponse.redirect(new URL("/dashboard", req.url));

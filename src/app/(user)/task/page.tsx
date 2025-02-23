@@ -1,6 +1,6 @@
 import React from 'react';
-import TaskCards from './TaskCards';
 import { Metadata } from 'next';
+import TaskLists from './TaskLists';
 
 export const metadata: Metadata = {
     title: "Tasks - TaskUp",
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 const Task = () => {
     return (
         <>
-            <TaskCards />
+            <TaskLists />
         </>
     );
 };

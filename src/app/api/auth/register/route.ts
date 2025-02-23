@@ -30,7 +30,7 @@ export async function POST(req: Request) {
             name,
             email,
             password: hashedPassword,
-            createdAt: new Date(),
+            createdAt: new Date().toISOString(),
         };
 
         await db.collection("users").insertOne(newUser);

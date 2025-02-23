@@ -36,7 +36,7 @@ export async function POST(req: Request) {
     const client = await clientPromise;
     const db = client.db("taskManagement");
     
-    const newTask = { taskName, description, dueDate, priority, taskCategory, createdAt: new Date(), userEmail };
+    const newTask = { taskName, description, dueDate, priority, taskCategory, createdAt: new Date().toISOString(), userEmail };
     const result = await db.collection("tasks").insertOne(newTask);
 
     return NextResponse.json({ success: true, message: 'Task added successfully', taskId: result.insertedId });
