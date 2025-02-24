@@ -62,7 +62,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 // Delete Single Todo
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
     try {
-        const { id } = params;
+        const { id } = await params;
         const { todoIndex } = await req.json();
 
         // Validate ID and index

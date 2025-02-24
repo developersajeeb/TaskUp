@@ -17,11 +17,10 @@ import NoTask from '../../../../public/images/no-task.svg';
 import Image from 'next/image';
 import EditTaskPopup from '@/components/EditTaskPopup';
 import TaskDetails from '@/components/TaskDetails';
-import { deleteTask, fetchTasks } from '@/services/task';
+import { deleteTask } from '@/services/task';
 import DeletePopup from '@/components/DeletePoup';
 import { RxGrid } from 'react-icons/rx';
 import { IoIosList } from 'react-icons/io';
-import TaskTable from '@/components/TaskTable';
 import { InputText } from 'primereact/inputtext';
 import { useForm } from 'react-hook-form';
 import TableLoader from '@/components/TableLoader';
@@ -89,12 +88,12 @@ const TaskLists = () => {
             }).toString();
 
             const response = await fetch(`/api/tasks/search?${queryParams}`);
-            const result = await response.json();
+            const data = await response.json();
 
-            if (result.success) {
-                setAllTasks(result.data || []);
+            if (data.success) {
+                setAllTasks(data.data || []);
             } else {
-                toast.error(result.message || 'Failed to load tasks.');
+                toast.error(data.message || 'Failed to load tasks.');
             }
         } catch (error) {
             console.error('Failed to load tasks:', error);
