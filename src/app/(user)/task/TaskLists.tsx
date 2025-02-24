@@ -24,6 +24,11 @@ import { IoIosList } from 'react-icons/io';
 import TaskTable from '@/components/TaskTable';
 import { InputText } from 'primereact/inputtext';
 import { useForm } from 'react-hook-form';
+import TableLoader from '@/components/TableLoader';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { IoEyeOutline } from 'react-icons/io5';
+import { Paginator } from 'primereact/paginator';
 
 interface TodoItem {
     workDone: boolean;
@@ -45,8 +50,9 @@ const TaskLists = () => {
     const [taskDetailsPopup, setTaskDetailsPopup] = useState<boolean>(false);
     const { data } = useSession();
     const userEmail = data?.user?.email;
-    const [allTasks, setAllTasks] = useState<TaskDetailsProps[] | null>(null);
+    const [allTasks, setAllTasks] = useState<TaskDetailsProps[]>([]);
     const [isDataLoading, setDataLoading] = useState<boolean>(true);
+    const [isDataTableLoading, setDataTableLoading] = useState<boolean>(true);
     const [activeOverlay, setActiveOverlay] = useState<string | null>(null);
     const [isDeleteIconLoading, setDeleteIconLoading] = useState<boolean>(false);
     const [taskIdForDetails, setTaskIdForDetails] = useState<string | null>(null);
@@ -59,24 +65,32 @@ const TaskLists = () => {
     const [todoLengthProgress, setTodoLengthProgress] = useState<TaskDetailsProps | null>(null);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const { register, handleSubmit, watch } = useForm();
+    const [first, setFirst] = useState<number>(0);
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const rowsPerPage = 5;
+
+    useEffect(() => {
+        setFirst((currentPage - 1) * rowsPerPage);
+    }, [currentPage]);
 
     const fetchUserTasks = async () => {
         if (!userEmail) return;
         setDataLoading(true);
-    
+        setDataTableLoading(true);
+
         const searchQuery = watch('searchQuery') || '';
         const priority = (watch('priority') || '').trim();
-    
+
         try {
             const queryParams = new URLSearchParams({
                 userEmail,
                 ...(searchQuery && { taskName: searchQuery }),
                 ...(priority && { priority }),
             }).toString();
-    
+
             const response = await fetch(`/api/tasks/search?${queryParams}`);
             const result = await response.json();
-    
+
             if (result.success) {
                 setAllTasks(result.data || []);
             } else {
@@ -86,8 +100,9 @@ const TaskLists = () => {
             console.error('Failed to load tasks:', error);
         } finally {
             setDataLoading(false);
+            setDataTableLoading(false);
         }
-    };    
+    };
 
     const handleDeleteTodo = (index: string) => {
         setDeleteTaskId(index);
@@ -146,47 +161,170 @@ const TaskLists = () => {
 
     return (
         <>
-            <BlockUI className="!bg-[#ffffffca] dark:!bg-[#121212e8] w-full !h-[calc(100vh-81px)] !z-[60]" blocked={isDataLoading} template={<CommonLoader />}>
-                <section className='flex flex-wrap justify-between items-center gap-5'>
-                    <h2 className="flex items-center gap-2 text-xl font-semibold text-gray-800 dark:text-white">
-                        <span className="flex h-9 w-9 max-w-9 items-center justify-center rounded-full bg-blue-100 dark:bg-slate-800 dark:text-white">
-                            <GoTasklist size={22} />
-                        </span>
-                        Tasks
-                    </h2>
+            {/* <BlockUI className="!bg-[#ffffffca] dark:!bg-[#121212e8] w-full !h-[calc(100vh-81px)] !z-[60]" blocked={isDataLoading} template={<CommonLoader />}> */}
+            <section className='flex flex-wrap justify-between items-center gap-5'>
+                <h2 className="flex items-center gap-2 text-xl font-semibold text-gray-800 dark:text-white">
+                    <span className="flex h-9 w-9 max-w-9 items-center justify-center rounded-full bg-blue-100 dark:bg-slate-800 dark:text-white">
+                        <GoTasklist size={22} />
+                    </span>
+                    Tasks
+                </h2>
 
-                    <div className='flex flex-wrap gap-4'>
-                        <form className='relative' onSubmit={handleSubmit(fetchUserTasks)}>
-                            <InputText placeholder="Search by name" {...register('searchQuery')} className='tu-input w-full !pr-9' />
-                            <button type='submit' className='absolute right-2 top-[9px] cursor-pointer'><FiSearch size={20} /></button>
-                        </form>
+                <div className='flex flex-wrap gap-4'>
+                    <form className='relative' onSubmit={handleSubmit(fetchUserTasks)}>
+                        <InputText placeholder="Search by name" {...register('searchQuery')} className='tu-input w-full !pr-9' />
+                        <button type='submit' className='absolute right-2 top-[9px] cursor-pointer'><FiSearch size={20} /></button>
+                    </form>
 
-                        <div className='flex items-center'>
-                            <span onClick={() => setViewMode('grid')} className={`text-white bg-[#004B93] cursor-pointer py-[10] px-3 rounded-l-lg ${viewMode === 'grid' && 'bg-[#004c93cf]'}`}><RxGrid size={22} /></span>
-                            <span onClick={() => setViewMode('list')} className={`text-white bg-[#004B93] cursor-pointer py-[10] px-3 rounded-r-lg ${viewMode === 'list' && 'bg-[#004c93cf]'}`}><IoIosList size={22} /></span>
-                        </div>
-                        <Button
-                            label="Add new task"
-                            className="primary-btn"
-                            onClick={() => setTaskAddForm(true)}
-                        />
+                    <div className='flex items-center'>
+                        <span onClick={() => setViewMode('grid')} className={`text-white bg-[#004B93] cursor-pointer py-[10] px-3 rounded-l-lg ${viewMode === 'grid' && 'bg-[#004c93cf]'}`}><RxGrid size={22} /></span>
+                        <span onClick={() => setViewMode('list')} className={`text-white bg-[#004B93] cursor-pointer py-[10] px-3 rounded-r-lg ${viewMode === 'list' && 'bg-[#004c93cf]'}`}><IoIosList size={22} /></span>
                     </div>
-                </section>
+                    <Button
+                        label="Add new task"
+                        className="primary-btn"
+                        onClick={() => setTaskAddForm(true)}
+                    />
+                </div>
+            </section>
 
-                {allTasks?.length === 0 ? (
-                    <div className='flex justify-center items-center h-[calc(100vh-180px)]'>
-                        <div>
-                            <Image className='w-full max-w-[300px] mx-auto' src={NoTask} height='150' width='50' alt='No task' />
-                            <p className='text-gray-600 dark:text-gray-100 text-center font-medium text-xl'>No Task Available!</p>
-                        </div>
+            {allTasks?.length === 0 ? (
+                <div className='flex justify-center items-center h-[calc(100vh-180px)]'>
+                    <div>
+                        <Image className='w-full max-w-[300px] mx-auto' src={NoTask} height='150' width='50' alt='No task' />
+                        <p className='text-gray-600 dark:text-gray-100 text-center font-medium text-xl'>No Task Available!</p>
                     </div>
-                ) : (
-                    <>
-                        {viewMode === 'list' ? (
-                            <section className='mt-10'>
-                                <TaskTable />
-                            </section>
-                        ) : (
+                </div>
+            ) : (
+                <>
+                    {viewMode === 'list' ? (
+                        <section className='mt-10 table-scrollbar overflow-x-auto rounded-xl dark:bg-[#1f1f1f]'>
+                            {isDataTableLoading ? (
+                                <TableLoader className="w-full" columnNames={['No.', 'Name', 'Due Date', 'Priority', 'Category', 'Status', 'Actions']} />
+                            ) : (
+                                <>
+                                    <DataTable
+                                        value={allTasks.slice(first, first + rowsPerPage)}
+                                        dataKey="_id"
+                                        tableStyle={{ minWidth: '75rem' }}
+                                        className="tu-data-table-wrapper"
+                                    >
+                                        <Column
+                                            header="No."
+                                            body={(rowData, { rowIndex }) => (
+                                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                    {first + rowIndex + 1}
+                                                </p>
+                                            )}
+                                            className="tu-table-column w-[60px]"
+                                        />
+                                        <Column
+                                            header="Name"
+                                            className="tu-table-column w-[250px]"
+                                            body={(item: TaskDetailsProps) => (
+                                                <p className="text-sm font-medium text-gray-800 dark:text-white dark:font-normal">{item?.taskName ?? '-'}</p>
+                                            )}
+                                        />
+                                        <Column
+                                            header="Due Date"
+                                            className="tu-table-column w-[130px]"
+                                            body={(item: TaskDetailsProps) => (
+                                                <p className="text-sm text-gray-700 dark:text-white">
+                                                    {item?.dueDate
+                                                        ? new Date(item.dueDate).toLocaleDateString('en-US').replace(/\//g, '/')
+                                                        : 'N/A'
+                                                    }
+                                                </p>
+                                            )}
+                                        />
+                                        <Column
+                                            header="Priority"
+                                            className="tu-table-column w-[130px]"
+                                            body={(item: TaskDetailsProps) => (
+                                                <p className="text-xs text-gray-700 dark:text-white font-medium">
+                                                    {item?.priority ? (
+                                                        <span className={`${item.priority === 'Low' ? 'bg-gray-200 dark:bg-[#64646454] px-2 py-1 rounded-md text-gray-500 dark:text-gray-100 border border-gray-300 dark:border-gray-600' :
+                                                            item.priority === 'Medium' ? 'bg-yellow-100 dark:bg-[#4d4b2a] px-2 py-1 rounded-md text-yellow-700 dark:text-[#cdbd63] border border-yellow-300 dark:border-[#cdb463]' :
+                                                                item.priority === 'High' ? 'bg-red-200 dark:bg-[#f8285942] px-2 py-1 rounded-md text-red-500 dark:text-[#F8285A] border border-[#f8285a33]' : ''
+                                                            }`}>
+                                                            {item.priority}
+                                                        </span>
+                                                    ) : (
+                                                        <span className='text-sm'>N/A</span>
+                                                    )}
+                                                </p>
+                                            )}
+                                        />
+                                        <Column
+                                            header="Category"
+                                            className="tu-table-column w-[300px]"
+                                            body={(item: TaskDetailsProps) => (
+                                                item?.taskCategory && Array.isArray(item.taskCategory) && item.taskCategory.length > 0 ? (
+                                                    <p className="text-sm text-gray-700 dark:text-white w-[300px] truncate">
+                                                        {item.taskCategory.map((taskCtg: any, index: number) => (
+                                                            <span
+                                                                key={`${item._id}-${index}`}
+                                                                className="inline-block rounded-lg px-2 py-1 bg-[#9C82F8] text-xs font-medium text-white mr-2"
+                                                            >
+                                                                {taskCtg}
+                                                            </span>
+                                                        ))}
+                                                    </p>
+                                                ) : (
+                                                    <p className="text-sm text-gray-700 dark:text-white">N/A</p>
+                                                )
+                                            )}
+                                        />
+                                        <Column
+                                            header="Status"
+                                            className="tu-table-column w-[130px]"
+                                            body={(item: TaskDetailsProps) => {
+                                                const isCurrentTask = todoLengthProgress?._id === item._id;
+                                                const isCompleted = isCurrentTask
+                                                    ? todoLengthProgress?.todoList?.every(todo => todo.workDone)
+                                                    : item?.todoList?.every(todo => todo.workDone);
+
+                                                const status = isCompleted ? "Completed" : "In Progress";
+
+                                                return (
+                                                    <span className={`text-xs font-medium py-1 px-2 rounded-md border ${status === 'Completed' ? 'text-green-500 dark:text-[#46AB7A] bg-green-100 dark:bg-[#1B3C48] border-green-300 dark:border-[#347e5a]' : 'text-[#ce8e3b] dark:text-[#CD9E63] bg-[#fff5df] dark:bg-[#4D3A2A] border-[#f8e197] dark:border-[#8a6a4f]'}`}>
+                                                        {status}
+                                                    </span>
+                                                );
+                                            }}
+                                        />
+                                        <Column
+                                            header="Actions"
+                                            className="tu-table-column w-[150px]"
+                                            body={(item: TaskDetailsProps) => (
+                                                <div className='flex items-center gap-3'>
+                                                    <span onClick={() => { setTaskDetailsPopup(true), setTaskIdForDetails(item._id) }} className="text-blue-500 hover:text-[#004A95] duration-300 cursor-pointer inline-block">
+                                                        <IoEyeOutline size={20} />
+                                                    </span>
+                                                    <Button onClick={() => handleDeleteTodo(item?._id)} className={`text-red-500 hover:text-red-600 dark:hover:text-red-600 duration-300 cursor-pointer inline-block focus:shadow-none ${isDeleteIconLoading && 'cursor-wait opacity-50'}`} disabled={isDeleteIconLoading}>
+                                                        <FiTrash2 size={18} />
+                                                    </Button>
+                                                    <span onClick={() => handleEditClick(item)} className="text-blue-500 hover:text-[#004A95] duration-300 cursor-pointer inline-block">
+                                                        <FiEdit3 size={18} />
+                                                    </span>
+                                                </div>
+                                            )}
+                                        ></Column>
+                                    </DataTable>
+                                    <Paginator
+                                        className="w-full text-sm bg-gray-200 dark:bg-[#181818] rounded-none text-gray-700 dark:text-white"
+                                        first={first}
+                                        rows={rowsPerPage}
+                                        totalRecords={allTasks.length}
+                                        template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
+                                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                                        onPageChange={(e) => setCurrentPage(e.page + 1)}
+                                    />
+                                </>
+                            )}
+                        </section>
+                    ) : (
+                        <BlockUI className="!bg-[#ffffffca] dark:!bg-[#121212e8] w-full !h-[calc(100vh-81px)] !z-[60]" blocked={isDataLoading} template={<CommonLoader />}>
                             <section className="grid md:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-7 mt-10">
                                 {allTasks?.map((tasks: any) => {
                                     return (
@@ -265,10 +403,11 @@ const TaskLists = () => {
                                     )
                                 })}
                             </section>
-                        )}
-                    </>
-                )}
-            </BlockUI>
+                        </BlockUI>
+                    )}
+                </>
+            )}
+            {/* </BlockUI> */}
 
             <DeletePopup deletePopup={deletePopup} setDeletePopup={setDeletePopup} onDelete={onConfirmDeleteTodo} deleteBtnLoading={isDeleteIconLoading} />
             <TaskDetails taskDetailsPopup={taskDetailsPopup} setTaskDetailsPopup={setTaskDetailsPopup} taskIdForDetails={taskIdForDetails} todoLengthProgress={todoLengthProgress} setTodoLengthProgress={setTodoLengthProgress} />

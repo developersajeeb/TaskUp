@@ -68,7 +68,7 @@ const TotalTaskGraph = () => {
             {isLoading ?
                 (<Skeleton width="100%" height="262px" className='dark:bg-[#1a1a1a] rounded-xl'></Skeleton>) : (
                     tasks?.length === 0 && completeTasks?.length === 0 && incompleteTasks?.length === 0 ? (
-                        <div className='text-gray-800 dark:text-white h-[296px] flex items-center justify-center'><p>No Data Available.</p></div>
+                        <div className='text-gray-500 h-[296px] flex items-center justify-center'><p>No Data Available.</p></div>
                     ) : (
                         <Chart type="doughnut" data={chartData} options={chartOptions} className="max-w-[262px] w-full mx-auto" />
                     )
