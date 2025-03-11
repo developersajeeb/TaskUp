@@ -20,7 +20,7 @@ TaskUp is a personal project management application designed to help users organ
 - **React Hook Form:** Simplifies form handling and validation.
 - **React Icons:** Provides a wide range of icons for the UI.
 - **React Toastify:** Enhances user experience with notifications.
-- **Node.js Version** 23.3.0
+- **Node.js Version** 23.8.0
 
 ## 🚀 Features
 
