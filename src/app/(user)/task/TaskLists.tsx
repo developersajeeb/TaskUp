@@ -176,8 +176,8 @@ const TaskLists = () => {
                     </form>
 
                     <div className='flex items-center'>
-                        <span onClick={() => setViewMode('grid')} className={`text-white bg-[#004B93] cursor-pointer py-[10] px-3 rounded-l-lg ${viewMode === 'grid' && 'bg-[#004c93cf]'}`}><RxGrid size={22} /></span>
-                        <span onClick={() => setViewMode('list')} className={`text-white bg-[#004B93] cursor-pointer py-[10] px-3 rounded-r-lg ${viewMode === 'list' && 'bg-[#004c93cf]'}`}><IoIosList size={22} /></span>
+                        <span onClick={() => setViewMode('grid')} className={`text-white bg-[#004B93] cursor-pointer py-[10px] px-3 rounded-l-lg ${viewMode === 'grid' && 'bg-[#004c93cf]'}`}><RxGrid size={22} /></span>
+                        <span onClick={() => setViewMode('list')} className={`text-white bg-[#004B93] cursor-pointer py-[10px] px-3 rounded-r-lg ${viewMode === 'list' && 'bg-[#004c93cf]'}`}><IoIosList size={22} /></span>
                     </div>
                     <Button
                         label="Add new task"
@@ -187,7 +187,7 @@ const TaskLists = () => {
                 </div>
             </section>
 
-            {allTasks?.length === 0 ? (
+            {allTasks?.length === 0 && !isDataTableLoading ? (
                 <div className='flex justify-center items-center h-[calc(100vh-180px)]'>
                     <div>
                         <Image className='w-full max-w-[300px] mx-auto' src={NoTask} height='150' width='50' alt='No task' />

@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import React, { ReactNode, useEffect, useRef } from 'react';
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
+import { ToastContainer } from 'react-toastify';
 
 const ThemeProvider = dynamic(
     () => import('next-themes').then((mod) => mod.ThemeProvider),
@@ -38,6 +39,7 @@ const AuthProvider = ({ children }: Props) => {
 
     return (
         <ThemeProvider enableSystem={true} attribute="class" defaultTheme="dark">
+            <ToastContainer />
             <SessionProvider>{children}</SessionProvider>
         </ThemeProvider>
     );

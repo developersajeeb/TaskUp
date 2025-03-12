@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
 }
 
 // Delete single Category
-export async function DELETE(req: NextResponse) {
+export async function DELETE(req: any) {
     try {
         const client = await clientPromise;
         const db = client.db("taskManagement");

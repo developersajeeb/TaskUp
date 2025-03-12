@@ -30,6 +30,7 @@ const TaskNumberOverview = () => {
                     setIsLoading(false);
                 } catch (error) {
                     console.error('Failed to fetch tasks:', error);
+                    setIsLoading(false);
                 }
             }
         };

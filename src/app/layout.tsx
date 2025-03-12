@@ -3,7 +3,7 @@ import "./globals.css";
 import "../styles/app.scss";
 import 'primereact/resources/primereact.min.css';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
-import AuthProvider from "@/halper/AuthProvider";
+import Providers from "@/halper/Providers";
 import { ToastContainer } from "react-toastify";
 
 export const metadata: Metadata = {
@@ -11,18 +11,17 @@ export const metadata: Metadata = {
   description: "Your personal project management",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
+interface Props {
   children: React.ReactNode;
-}>) {
+}
+
+export default function RootLayout({ children }: Props) {
   return (
     <html lang="en">
       <body>
-        <AuthProvider>
-            <ToastContainer />
-            <main>{children}</main>
-        </AuthProvider>
+        <Providers>
+        <main>{children}</main>
+        </Providers>
       </body>
     </html >
   );

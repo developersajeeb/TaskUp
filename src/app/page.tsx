@@ -1,17 +1,24 @@
 'use client';
+import CommonLoader from "@/components/CommonLoader";
 import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const Home = () => {
   const session = useSession();
+  const router = useRouter();
 
-  if(session.status === "authenticated") {
-    redirect(`/dashboard`);
+  useEffect(() => {
+    if (session?.status === "authenticated") {
+      router.push("/dashboard");
+    }
+  }, [session?.status, router]);
+
+  if (session?.status === "loading") {
+    return <CommonLoader />;
   }
 
-  return (
-    <></>
-  );
+  return <></>;
 };
 
 export default Home;

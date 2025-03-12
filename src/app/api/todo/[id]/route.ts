@@ -4,7 +4,7 @@ import { ObjectId } from "mongodb";
 import { NextApiRequest } from "next";
 
 // Todo Complete/Incomplete
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: any, {params}: any) {
     try {
         const { id } = await params;
 
@@ -60,7 +60,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 // Delete Single Todo
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: any, { params }: any) {
     try {
         const { id } = await params;
         const { todoIndex } = await req.json();

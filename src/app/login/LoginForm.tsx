@@ -75,7 +75,6 @@ const LoginForm: FunctionComponent = () => {
         setIsFormBtnLoading(false);
         toast.error(errMsg);
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       const errMsg = 'The provided credentials do not match our records';
       setIsFormBtnLoading(false);

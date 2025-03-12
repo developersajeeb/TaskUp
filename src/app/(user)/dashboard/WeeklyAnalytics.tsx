@@ -136,8 +136,6 @@ const WeeklyAnalytics = () => {
         <div className='bg-gray-50 dark:bg-[#1f1f1f] p-4 md:p-6 rounded-2xl'>
             {isLoading ? (
                 <Skeleton width="100%" height="180px" className="dark:bg-[#1a1a1a] rounded-xl" />
-            ) : tasks.length === 0 ? (
-                <div className="text-center text-gray-500 py-4">No Data Here</div>
             ) : (
                 <Chart type="line" data={chartData} options={chartOptions} />
             )}

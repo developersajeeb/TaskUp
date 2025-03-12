@@ -4,7 +4,7 @@ import { ObjectId } from "mongodb";
 import { NextApiRequest } from "next";
 
 // Delete The Task
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: any) {
   try {
     const { id } = await params;
 
@@ -38,13 +38,13 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 }
 
 // Update the Task
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, {params}: any) {
 
   try {
     const client = await clientPromise;
     const db = client.db("taskManagement");
 
-    const { taskName, description, dueDate, priority, taskCategory } = await req.json();
+    const { taskName, description, dueDate, priority, taskCategory } = await request.json();
     const { id } = await params;
 
     if (!id) {
@@ -78,11 +78,11 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 }
 
 // Get The Single Task
-export async function GET(req: NextRequest, { params }: { params: { id?: string } }) {
+export async function GET(req: NextRequest,{params}: any) {
   try {
     const {id} = await params;
 
-    if (!id || id === "null" || id === "undefined" || id.length !== 24 || !/^[0-9a-fA-F]{24}$/.test(id)) {
+    if (!id || id.length !== 24 || !/^[0-9a-fA-F]{24}$/.test(id)) {
       return NextResponse.json({ success: false, message: "Invalid Task ID." }, { status: 400 });
     }
 

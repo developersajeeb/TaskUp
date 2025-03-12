@@ -1,60 +1,36 @@
-# TaskUp
-TaskUp is a personal project management application designed to help users organize and prioritize their tasks efficiently. The application is built using modern web technologies and provides a user-friendly interface for managing tasks, projects, and deadlines.
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## 🌟 Technologies Used
+## Getting Started
 
-### **Frontend:**
-- **Next.js:** TaskUp is built using Next.js, a popular JavaScript library for building user interfaces.
-- **PrimeReact:** The application utilizes PrimeReact, a comprehensive React UI component library, for styling and layout.
+First, run the development server:
 
-### **Backend:**
-- **Next.js:** The backend is built using Next.js, a React-based framework for server-side rendering (SSR) and static site generation (SSG).
-- **MongoDB:** TaskUp uses MongoDB as the database management system for storing user data and tasks.
-- **Node.js:** TaskUp uses Node.js as the runtime environment for server-side operations.
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-### **Authentication:**
-- **NextAuth:** TaskUp uses NextAuth, a complete open-source authentication solution for Next.js, to handle user authentication and authorization.
-- **Password Hashing:** TaskUp implements a secure password hashing system to protect user credentials.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-### **Other Dependencies:**
-- **React Hook Form:** Simplifies form handling and validation.
-- **React Icons:** Provides a wide range of icons for the UI.
-- **React Toastify:** Enhances user experience with notifications.
-- **Node.js Version** 23.8.0
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## 🚀 Features
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-### 📝 **Task Management:**
-- Create, edit, and delete tasks with ease.
-- Assign due dates and priorities for better organization.
-- User can find his task easily using filter and search options.
+## Learn More
 
-### 📚 **Category Management:**
-- Users can add new categories to organize tasks efficiently.
-- Search functionality to quickly find specific categories.
-- Option to delete categories when no longer needed.
+To learn more about Next.js, take a look at the following resources:
 
-### 📂 **Todo Management:**
-- Add Todo list in every task with checkbox.
-- When complete single todo then click the checkbox and todo marked as complete.
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-### 📊 **Task Prioritization:**
-- User can task Priority with (Low, Medium, High).
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-### ⏰ **Due Date Reminders:**
-- Receive reminders when tasks are approaching their due dates.
+## Deploy on Vercel
 
-### 📈 **Task Status Tracking:**
-- Track the status of tasks, including **Completed**, **In Progress**, and **Pending**.
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-### 👤 **User Profile Management:**
-- User can reset his password by reset link with reset token.
-
-### 🔒 **Authentication and Authorization:**
-- Secure user authentication with NextAuth.
-- Ensure only authorized users can access and manage tasks.
-
-## 📧 **Contact:**
-For questions or support, please contact the project developer.
-- sajeebdebnath1435@gmail.com
-- www.developersajeeb.com
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

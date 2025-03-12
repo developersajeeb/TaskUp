@@ -46,10 +46,11 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails, 
     const [addTodoList, setAddTodoList] = useState<boolean>(false);
     const [deletePopup, setDeletePopup] = useState<boolean>(false);
     const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
-
+    
     const fetchTasksDetails = async () => {
         if (!taskIdForDetails) return;
         setDataLoading(true);
+    
         try {
             const data = await fetchTaskDetails(taskIdForDetails);
             setTodoLengthProgress(data);
@@ -58,7 +59,7 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails, 
         } finally {
             setDataLoading(false);
         }
-    };    
+    };  
     useEffect(() => {
         fetchTasksDetails();
     }, [taskIdForDetails, taskDetailsPopup]);
