@@ -323,7 +323,7 @@ const TaskLists = () => {
                             )}
                         </section>
                     ) : (
-                        <BlockUI className="!bg-[#ffffffca] dark:!bg-[#121212e8] w-full !h-[calc(100vh-81px)] !z-[60]" blocked={isDataLoading} template={<CommonLoader />}>
+                        <BlockUI className="!bg-[#ffffffca] dark:!bg-[#121212e8] w-full !h-[calc(100vh-162px)] !z-[60]" blocked={isDataLoading} template={<CommonLoader />}>
                             <section className="grid md:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-7 mt-10">
                                 {allTasks?.map((tasks: any) => {
                                     return (
