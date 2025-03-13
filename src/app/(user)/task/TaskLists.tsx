@@ -28,6 +28,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { IoEyeOutline } from 'react-icons/io5';
 import { Paginator } from 'primereact/paginator';
+import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 
 interface TodoItem {
     workDone: boolean;
@@ -67,6 +68,12 @@ const TaskLists = () => {
     const [first, setFirst] = useState<number>(0);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const rowsPerPage = 5;
+    const [selectedPriority, setSelectedPriority] = useState<string | null>(null);
+    const priorityOptions = [
+        { name: 'Low' },
+        { name: 'Medium' },
+        { name: 'High' }
+    ];
 
     useEffect(() => {
         setFirst((currentPage - 1) * rowsPerPage);
@@ -87,7 +94,7 @@ const TaskLists = () => {
                 ...(priority && { priority }),
             }).toString();
 
-            const response = await fetch(`/api/tasks/search?${queryParams}`);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/tasks/search?${queryParams}`);
             const data = await response.json();
 
             if (data.success) {
@@ -160,7 +167,6 @@ const TaskLists = () => {
 
     return (
         <>
-            {/* <BlockUI className="!bg-[#ffffffca] dark:!bg-[#121212e8] w-full !h-[calc(100vh-81px)] !z-[60]" blocked={isDataLoading} template={<CommonLoader />}> */}
             <section className='flex flex-wrap justify-between items-center gap-5'>
                 <h2 className="flex items-center gap-2 text-xl font-semibold text-gray-800 dark:text-white">
                     <span className="flex h-9 w-9 max-w-9 items-center justify-center rounded-full bg-blue-100 dark:bg-slate-800 dark:text-white">
@@ -170,6 +176,10 @@ const TaskLists = () => {
                 </h2>
 
                 <div className='flex flex-wrap gap-4'>
+                    <div>
+                        <Dropdown value={selectedPriority} onChange={(e: DropdownChangeEvent) => setSelectedPriority(e.value)} options={priorityOptions} optionLabel="name"
+                            showClear placeholder="Select a priority" className="tu-dropdown-borderless w-[160px]" />
+                    </div>
                     <form className='relative' onSubmit={handleSubmit(fetchUserTasks)}>
                         <InputText placeholder="Search by name" {...register('searchQuery')} className='tu-input w-full !pr-9' />
                         <button type='submit' className='absolute right-2 top-[9px] cursor-pointer'><FiSearch size={20} /></button>
@@ -326,6 +336,12 @@ const TaskLists = () => {
                         <BlockUI className="!bg-[#ffffffca] dark:!bg-[#121212e8] w-full !h-[calc(100vh-162px)] !z-[60]" blocked={isDataLoading} template={<CommonLoader />}>
                             <section className="grid md:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-7 mt-10">
                                 {allTasks?.map((tasks: any) => {
+                                    const isCurrentTask = todoLengthProgress?._id === tasks._id;
+                                    const isCompleted = isCurrentTask
+                                        ? todoLengthProgress?.todoList?.every(todo => todo.workDone)
+                                        : tasks?.todoList?.every((todo: { workDone: boolean; }) => todo.workDone);
+                                    const status = isCompleted ? "Completed" : "In Progress";
+
                                     return (
                                         <div key={tasks._id} className={`bg-[#dbe8f5] dark:bg-[#36516c] p-5 rounded-xl border-2 border-[#cfe2f5] dark:border-[#486480] relative overflow-hidden`}>
                                             {tasks?.priority !== null &&
@@ -349,11 +365,11 @@ const TaskLists = () => {
 
                                             <div className="mt-5 mb-8">
                                                 <div className="mb-2 flex items-center gap-4 justify-between">
-                                                    <p className="text-xs flex items-center font-medium text-gray-600 dark:text-gray-100">
+                                                    <p className={`text-xs flex items-center gap-1 font-medium border rounded-md py-1 px-2 ${status === 'Completed' ? 'text-green-500 dark:text-[#46AB7A] bg-green-100 dark:bg-[#1B3C48] border-green-300 dark:border-[#347e5a]' : 'text-[#ce8e3b] dark:text-[#CD9E63] bg-[#fff5df] dark:bg-[#4D3A2A] border-[#f8e197] dark:border-[#8a6a4f]'}`}>
                                                         <span>
                                                             <LuChartBarStacked />
-                                                        </span>{" "}
-                                                        Progress
+                                                        </span>
+                                                        <span>{status}</span>
                                                     </p>
                                                     <p className="text-xs font-medium text-gray-600 dark:text-gray-100">
                                                         {todoLengthProgress?._id === tasks?._id && todoLengthProgress?.todoList
@@ -406,7 +422,6 @@ const TaskLists = () => {
                     )}
                 </>
             )}
-            {/* </BlockUI> */}
 
             <DeletePopup deletePopup={deletePopup} setDeletePopup={setDeletePopup} onDelete={onConfirmDeleteTodo} deleteBtnLoading={isDeleteIconLoading} />
             <TaskDetails taskDetailsPopup={taskDetailsPopup} setTaskDetailsPopup={setTaskDetailsPopup} taskIdForDetails={taskIdForDetails} todoLengthProgress={todoLengthProgress} setTodoLengthProgress={setTodoLengthProgress} />
