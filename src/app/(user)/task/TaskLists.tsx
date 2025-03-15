@@ -68,7 +68,7 @@ const TaskLists = () => {
     const [first, setFirst] = useState<number>(0);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const rowsPerPage = 5;
-    const [selectedPriority, setSelectedPriority] = useState<string | null>(null);
+    const [selectedPriority, setSelectedPriority] = useState<{name: string} | null>(null);
     const priorityOptions = [
         { name: 'Low' },
         { name: 'Medium' },
@@ -85,7 +85,8 @@ const TaskLists = () => {
         setDataTableLoading(true);
 
         const searchQuery = watch('searchQuery') || '';
-        const priority = (watch('priority') || '').trim();
+        const priority = selectedPriority?.name || '';
+        console.log(priority);
 
         try {
             const queryParams = new URLSearchParams({
@@ -109,6 +110,33 @@ const TaskLists = () => {
             setDataTableLoading(false);
         }
     };
+
+    const fetchPriorityTasks = async (priority: string) => {
+        if (!userEmail) return;
+        setDataLoading(true);
+        setDataTableLoading(true);
+    
+        try {
+            const queryParams = new URLSearchParams({
+                userEmail,
+                ...(priority && { priority }),
+            }).toString();
+    
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/tasks/search?${queryParams}`);
+            const data = await response.json();
+    
+            if (data.success) {
+                setAllTasks(data.data || []);
+            } else {
+                toast.error(data.message || 'Failed to load tasks.');
+            }
+        } catch (error) {
+            console.error('Failed to load priority tasks:', error);
+        } finally {
+            setDataLoading(false);
+            setDataTableLoading(false);
+        }
+    };    
 
     const handleDeleteTodo = (index: string) => {
         setDeleteTaskId(index);
@@ -177,8 +205,17 @@ const TaskLists = () => {
 
                 <div className='flex flex-wrap gap-4'>
                     <div>
-                        <Dropdown value={selectedPriority} onChange={(e: DropdownChangeEvent) => setSelectedPriority(e.value)} options={priorityOptions} optionLabel="name"
-                            showClear placeholder="Select a priority" className="tu-dropdown-borderless w-[160px]" />
+                        <Dropdown 
+                        value={selectedPriority} 
+                        onChange={(e: DropdownChangeEvent) => {
+                            setSelectedPriority(e.value);
+                            fetchPriorityTasks(e.value?.name || "");
+                        }}
+                        options={priorityOptions} 
+                        optionLabel="name"
+                        showClear 
+                        placeholder="Select a priority" 
+                        className="tu-dropdown-borderless w-[160px] min-w-[160px]" />
                     </div>
                     <form className='relative' onSubmit={handleSubmit(fetchUserTasks)}>
                         <InputText placeholder="Search by name" {...register('searchQuery')} className='tu-input w-full !pr-9' />
