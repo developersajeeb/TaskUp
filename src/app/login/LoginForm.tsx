@@ -35,8 +35,8 @@ const LoginForm: FunctionComponent = () => {
     clearErrors,
   } = useForm<LoginPayload>({
     defaultValues: {
-      email: '',
-      password: '',
+      email: 'sajeebdebnath1435@gmail.com',
+      password: '123456',
     },
   });
 

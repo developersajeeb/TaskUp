@@ -13,7 +13,7 @@ const Login = () => {
 
     return (
         <section className="bg-gray-100 dark:bg-[#111111] p-4">
-            <div className='bg-no-repeat bg-center bg-cover flex h-[calc(100vh-32px)] items-center justify-center rounded-xl' style={{ backgroundImage: `url(${Bg.src})` }}>
+            <div className='bg-no-repeat bg-center bg-cover flex h-[calc(100vh-32px)] items-center justify-center rounded-xl px-4' style={{ backgroundImage: `url(${Bg.src})` }}>
                 <div className="login-box-shadow w-full max-w-[370px] rounded-xl bg-white dark:bg-[#1B1B1B]">
                     <div className="p-7 md:p-10">
                         <h3 className="mb-2.5 text-center text-lg font-semibold leading-none text-gray-900 dark:text-white">Log In</h3>

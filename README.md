@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TaskUp - Personal Task Management Software
 
-## Getting Started
+## 🚀 Overview
+TaskUp is a personal task management software designed to help users organize their tasks efficiently. Built with **Next.js, PrimeReact, Tailwind CSS, SCSS, Node.js, and MongoDB**, TaskUp ensures a seamless experience with powerful features like task tracking, categorization, and a progress monitoring system.
 
-First, run the development server:
+## ✨ Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Authentication System**
+  - Login & Signup with email verification
+  - Forgot Password functionality via email
+  - Passwords are securely stored using a hashing system
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **User Interface**
+  - Light & Dark Mode
+  - Responsive and user-friendly design
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Task Management**
+  - Dashboard displaying total tasks, completed, and incomplete tasks
+  - Interactive charts (Total Chart & Weekly Chart)
+  - Add, edit, and delete tasks with the following details:
+    - Task Name
+    - Description
+    - Category
+    - Due Date
+    - Priority Level
+  - Filter tasks by search with task name and priority
+  - View tasks in both **Table** and **Grid** layouts
+  
+- **To-Do List Integration**
+  - Each task supports a to-do list
+  - Checkbox functionality to mark individual to-dos as completed
+  - Task progress bar updates dynamically based on completed to-dos
+  - Tasks automatically marked as completed when all to-dos are checked
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Category Management**
+  - View all categories
+  - Search and filter categories easily
+  - Delete categories as needed
 
-## Learn More
+## 🛠️ Tech Stack
+- **Frontend:** Next.js, PrimeReact, Tailwind CSS, SCSS
+- **Backend:** Node.js, Express.js, MongoDB
+- **Authentication:** JWT (JSON Web Token) & Secure Password Hashing
 
-To learn more about Next.js, take a look at the following resources:
+## 🌐 Live Demo
+🚀 Check out the live version of TaskUp here:  
+👉 [TaskUp Live](https://taskup-pro.vercel.app/)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📸 Screenshots
+![Dashboard View](https://drive.google.com/file/d/1e4sdQRtqykWWRL5DSxYP4ThQtnEpDNnm/view?usp=sharing)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+![Task List View](https://drive.google.com/file/d/1uabn9F3pQ3_qYwtv3v6kOJ6j_bv4320J/view?usp=sharing)
 
-## Deploy on Vercel
+![Task Details View](https://drive.google.com/file/d/1JhtuiUCha9nx5-qGe_6Mx0oUoDkYnr53/view?usp=sharing)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+![Task Add Popup](https://drive.google.com/file/d/1MUZ5SUVKiqWzRoPtNA34b0qZfRpjypi2/view?usp=sharing)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+![Categories view](https://drive.google.com/file/d/1qGn9JPS-Ce1TgN0pTqSP5DENO-RM9c5v/view?usp=sharing)
+
+![Login Page](https://drive.google.com/file/d/1HMAYkjnT9QUMHWhNm6CaB1ksfvWPrxr1/view?usp=sharing)
+
+![SignUp Page](https://drive.google.com/file/d/1WQAZmgQXQTFUpfxUW7n4oV-fS6UiuViD/view?usp=sharing)
+
+![Dark Mode Preview](https://drive.google.com/file/d/1S2oUphhYEQSxbjrJTR7UwKIIJDNm5TXi/view?usp=sharing)
+
+---
+
+🌟 **TaskUp – Stay Organized, Stay Productive!**
