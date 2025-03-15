@@ -49,19 +49,19 @@ TaskUp is a personal task management software designed to help users organize th
 ## 📸 Screenshots
 ![Dashboard View](https://raw.githubusercontent.com/developersajeeb/TaskUp/main/public/images/dashboard.png)
 
-![Task List View](https://drive.google.com/file/d/1uabn9F3pQ3_qYwtv3v6kOJ6j_bv4320J/view?usp=sharing)
+![Task List View](https://raw.githubusercontent.com/developersajeeb/TaskUp/main/public/images/tasks.png)
 
-![Task Details View](https://drive.google.com/file/d/1JhtuiUCha9nx5-qGe_6Mx0oUoDkYnr53/view?usp=sharing)
+![Task Details View](https://raw.githubusercontent.com/developersajeeb/TaskUp/main/public/images/taskdetails.png)
 
-![Task Add Popup](https://drive.google.com/file/d/1MUZ5SUVKiqWzRoPtNA34b0qZfRpjypi2/view?usp=sharing)
+![Task Add Popup](https://raw.githubusercontent.com/developersajeeb/TaskUp/main/public/images/taskadd.png)
 
-![Categories view](https://drive.google.com/file/d/1qGn9JPS-Ce1TgN0pTqSP5DENO-RM9c5v/view?usp=sharing)
+![Categories view](https://raw.githubusercontent.com/developersajeeb/TaskUp/main/public/images/categories.png)
 
-![Login Page](https://drive.google.com/file/d/1HMAYkjnT9QUMHWhNm6CaB1ksfvWPrxr1/view?usp=sharing)
+![Login Page](https://raw.githubusercontent.com/developersajeeb/TaskUp/main/public/images/login.png)
 
-![SignUp Page](https://drive.google.com/file/d/1WQAZmgQXQTFUpfxUW7n4oV-fS6UiuViD/view?usp=sharing)
+![SignUp Page](https://raw.githubusercontent.com/developersajeeb/TaskUp/main/public/images/reg.png)
 
-![Dark Mode Preview](https://drive.google.com/file/d/1S2oUphhYEQSxbjrJTR7UwKIIJDNm5TXi/view?usp=sharing)
+![Dark Mode Preview](https://raw.githubusercontent.com/developersajeeb/TaskUp/main/public/images/lightanddark.jpg)
 
 ---
 
