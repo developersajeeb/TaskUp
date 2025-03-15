@@ -6,7 +6,7 @@ TaskUp is a personal task management software designed to help users organize th
 ## ✨ Features
 
 - **Authentication System**
-  - Login & Signup with email verification
+  - Login & SignUp with email verification
   - Forgot Password functionality via email
   - Passwords are securely stored using a hashing system
 
@@ -47,7 +47,7 @@ TaskUp is a personal task management software designed to help users organize th
 👉 [TaskUp Live](https://taskup-pro.vercel.app/)
 
 ## 📸 Screenshots
-![Dashboard View](https://drive.google.com/file/d/1e4sdQRtqykWWRL5DSxYP4ThQtnEpDNnm/view?usp=sharing)
+![Dashboard View](https://raw.githubusercontent.com/developersajeeb/TaskUp/main/public/images/dashboard.png)
 
 ![Task List View](https://drive.google.com/file/d/1uabn9F3pQ3_qYwtv3v6kOJ6j_bv4320J/view?usp=sharing)
 
