@@ -74,10 +74,10 @@ export async function DELETE(req: any) {
 
         const { searchParams } = new URL(req.url);
         const userEmail = searchParams.get('email');
-        const index = parseInt(searchParams.get('index') || '-1');
+        const categoryName = searchParams.get('categoryName');
 
-        if (!userEmail || index < 0) {
-            return NextResponse.json({ success: false, message: 'User email and valid index are required' }, { status: 400 });
+        if (!userEmail || !categoryName) {
+            return NextResponse.json({ success: false, message: 'User email and valid category name are required' }, { status: 400 });
         }
 
         // Find user categories
@@ -86,28 +86,27 @@ export async function DELETE(req: any) {
             return NextResponse.json({ success: false, message: 'Categories not found' }, { status: 404 });
         }
 
-        // Get the category name to delete
-        const categoryToDelete = user.categories[index];
-        if (!categoryToDelete) {
-            return NextResponse.json({ success: false, message: 'Invalid category index' }, { status: 400 });
+        // Check if the category exists
+        if (!user.categories.includes(categoryName)) {
+            return NextResponse.json({ success: false, message: 'Category not found' }, { status: 400 });
         }
 
-        // Check if the category exists in any other task
+        // Check if the category is used in tasks
         const matchingTasks = await tasksCollection.find({
             userEmail,
-            taskCategory: categoryToDelete,
+            taskCategory: categoryName,
         }).toArray();
 
         if (matchingTasks.length > 0) {
             // If category exists in tasks, remove it from all tasks
             await tasksCollection.updateMany(
                 { userEmail },
-                { $pull: { taskCategory: categoryToDelete } }
+                { $pull: { taskCategory: { $eq: categoryName } } } as any
             );
         }
 
-        // Remove the category from categories collection
-        const updatedCategories = user.categories.filter((_: any, i: number) => i !== index);
+        // Remove the category from the categories collection
+        const updatedCategories = user.categories.filter((category: string) => category !== categoryName);
         await categoriesCollection.updateOne(
             { userEmail },
             { $set: { categories: updatedCategories } }

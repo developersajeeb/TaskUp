@@ -24,7 +24,7 @@ const AllCategories = () => {
     const [visibleCtgPopup, setVisibleCtgPopup] = useState<boolean>(false);
     const [taskCategories, setTaskCategories] = useState<TaskCategory[]>([]);
     const [deletePopup, setDeletePopup] = useState<boolean>(false);
-    const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
+    const [deleteIndex, setDeleteIndex] = useState<string>('');
     const sessionData = useSession();
     const userEmail = sessionData?.data?.user?.email;
     const { register, handleSubmit, watch } = useForm();
@@ -54,19 +54,19 @@ const AllCategories = () => {
         fetchUserCategories();
     };
 
-    const handleDeleteCategory = (index: number) => {
-        setDeleteIndex(index);
+    const handleDeleteCategory = (categoryName: string) => {
+        setDeleteIndex(categoryName);
         setDeletePopup(true);
-    };
+    };    
 
     const onConfirmDeleteCtg = async () => {
-        if (!userEmail || !taskCategories || deleteIndex === null) return;
+        if (!userEmail || !taskCategories || !deleteIndex) return;
         setDataLoading(true);
         try {
             const response = await deleteCategory(userEmail, deleteIndex);
             if (response?.success) {
                 toast.success(response?.message);
-                const updatedCategories = taskCategories.filter((_, i) => i !== deleteIndex);
+                const updatedCategories = taskCategories.filter(category => category.taskCategory !== deleteIndex);
                 setTaskCategories(updatedCategories);
             } else {
                 console.error(response?.message || 'Failed to delete category');
@@ -75,10 +75,10 @@ const AllCategories = () => {
             console.error('Error deleting category:', error);
         } finally {
             setDeletePopup(false);
-            setDeleteIndex(null);
+            setDeleteIndex('');
             setDataLoading(false);
         }
-    };
+    };    
 
     return (
         <BlockUI className="!bg-[#ffffffca] dark:!bg-[#121212e8] w-full !h-[calc(100vh-81px)] !z-[60]" blocked={isDataLoading} template={<CommonLoader />}>
@@ -118,7 +118,7 @@ const AllCategories = () => {
                         return (
                             <li key={index} className={`flex flex-col md:flex-row gap-3 bg-gray-100 dark:bg-[#303030] p-4 md:p-5 rounded-lg border-2 border-gray-200 dark:border-[#484848] relative`}>
                                 <p className='text-gray-800 dark:text-white'>{category?.taskCategory}</p>
-                                <p onClick={() => handleDeleteCategory(index)} className='bg-red-500 w-6 h-6 flex items-center justify-center rounded-tl-none rounded-tr-[10px] rounded-bl-[30px] text-white absolute top-0 right-0 opacity-75 cursor-pointer hover:opacity-100 duration-300'><FiTrash2 size={14} className='-mt-[3px] -mr-[3px]' /></p>
+                                <p onClick={() => handleDeleteCategory(category.taskCategory)} className='bg-red-500 w-6 h-6 flex items-center justify-center rounded-tl-none rounded-tr-[10px] rounded-bl-[30px] text-white absolute top-0 right-0 opacity-75 cursor-pointer hover:opacity-100 duration-300'><FiTrash2 size={14} className='-mt-[3px] -mr-[3px]' /></p>
                             </li>
                         );
                     })}

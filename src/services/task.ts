@@ -126,11 +126,12 @@ export const searchCategories = async (userEmail: string, searchQuery: string = 
 };
 
 // Category Delete Function
-export const deleteCategory = async (email: string, index: number) => {
+export const deleteCategory = async (email: string, categoryName: string) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${CATEGORY_URL}?email=${email}&index=${index}`, {
-            method: 'DELETE',
-        });
+        const response = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}${CATEGORY_URL}?email=${email}&categoryName=${encodeURIComponent(categoryName)}`,
+            { method: 'DELETE' }
+        );
         return await response.json();
     } catch (error) {
         console.error('Failed to delete category:', error);
