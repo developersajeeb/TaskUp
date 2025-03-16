@@ -146,7 +146,7 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails, 
             setDeleteIndex(null);
             setDataLoading(false);
         }
-    };    
+    };
 
     return (
         <Dialog header={customHeader} visible={taskDetailsPopup} className='w-full max-w-[750px] mx-4 z-[70]' onHide={() => setTaskDetailsPopup(false)}>

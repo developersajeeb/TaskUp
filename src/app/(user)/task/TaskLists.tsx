@@ -68,7 +68,7 @@ const TaskLists = () => {
     const [first, setFirst] = useState<number>(0);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const rowsPerPage = 5;
-    const [selectedPriority, setSelectedPriority] = useState<{name: string} | null>(null);
+    const [selectedPriority, setSelectedPriority] = useState<{ name: string } | null>(null);
     const priorityOptions = [
         { name: 'Low' },
         { name: 'Medium' },
@@ -115,16 +115,16 @@ const TaskLists = () => {
         if (!userEmail) return;
         setDataLoading(true);
         setDataTableLoading(true);
-    
+
         try {
             const queryParams = new URLSearchParams({
                 userEmail,
                 ...(priority && { priority }),
             }).toString();
-    
+
             const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/tasks/search?${queryParams}`);
             const data = await response.json();
-    
+
             if (data.success) {
                 setAllTasks(data.data || []);
             } else {
@@ -136,7 +136,7 @@ const TaskLists = () => {
             setDataLoading(false);
             setDataTableLoading(false);
         }
-    };    
+    };
 
     const handleDeleteTodo = (index: string) => {
         setDeleteTaskId(index);
@@ -205,17 +205,17 @@ const TaskLists = () => {
 
                 <div className='flex flex-wrap gap-4'>
                     <div>
-                        <Dropdown 
-                        value={selectedPriority} 
-                        onChange={(e: DropdownChangeEvent) => {
-                            setSelectedPriority(e.value);
-                            fetchPriorityTasks(e.value?.name || "");
-                        }}
-                        options={priorityOptions} 
-                        optionLabel="name"
-                        showClear 
-                        placeholder="Select a priority" 
-                        className="tu-dropdown-borderless w-[160px] min-w-[160px]" />
+                        <Dropdown
+                            value={selectedPriority}
+                            onChange={(e: DropdownChangeEvent) => {
+                                setSelectedPriority(e.value);
+                                fetchPriorityTasks(e.value?.name || "");
+                            }}
+                            options={priorityOptions}
+                            optionLabel="name"
+                            showClear
+                            placeholder="Select a priority"
+                            className="tu-dropdown-borderless w-[160px] min-w-[160px]" />
                     </div>
                     <form className='relative' onSubmit={handleSubmit(fetchUserTasks)}>
                         <InputText placeholder="Search by name" {...register('searchQuery')} className='tu-input w-full !pr-9' />
@@ -372,29 +372,29 @@ const TaskLists = () => {
                     ) : (
                         <BlockUI className="!bg-[#ffffffca] dark:!bg-[#121212e8] w-full !h-[calc(100vh-162px)] !z-[60]" blocked={isDataLoading} template={<CommonLoader />}>
                             <section className="grid md:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-7 mt-10">
-                                {allTasks?.map((tasks: any) => {
-                                    const isCurrentTask = todoLengthProgress?._id === tasks._id;
+                                {allTasks?.map((task: any) => {
+                                    const isCurrentTask = todoLengthProgress?._id === task._id;
                                     const isCompleted = isCurrentTask
                                         ? todoLengthProgress?.todoList?.every(todo => todo.workDone)
-                                        : tasks?.todoList?.every((todo: { workDone: boolean; }) => todo.workDone);
+                                        : task?.todoList?.every((todo: { workDone: boolean; }) => todo.workDone);
                                     const status = isCompleted ? "Completed" : "In Progress";
 
                                     return (
-                                        <div key={tasks._id} className={`bg-[#dbe8f5] dark:bg-[#36516c] p-5 rounded-xl border-2 border-[#cfe2f5] dark:border-[#486480] relative overflow-hidden`}>
-                                            {tasks?.priority !== null &&
-                                                <div className={`absolute transform -rotate-45 text-center text-white font-medium text-[10px] py-1 left-[-30px] top-[8px] w-[100px] shadow-md shadow-[#46464624] ${tasks?.priority === 'Low' && 'bg-gray-400' || tasks?.priority === 'Medium' && 'bg-yellow-500' || tasks?.priority === 'High' && 'bg-red-500'}`}>{tasks?.priority}</div>
+                                        <div key={task._id} className={`bg-[#dbe8f5] dark:bg-[#36516c] p-5 rounded-xl border-2 border-[#cfe2f5] dark:border-[#486480] relative overflow-hidden`}>
+                                            {task?.priority !== null &&
+                                                <div className={`absolute transform -rotate-45 text-center text-white font-medium text-[10px] py-1 left-[-30px] top-[8px] w-[100px] shadow-md shadow-[#46464624] ${task?.priority === 'Low' && 'bg-gray-400' || task?.priority === 'Medium' && 'bg-yellow-500' || task?.priority === 'High' && 'bg-red-500'}`}>{task?.priority}</div>
                                             }
                                             <div className="flex gap-2 justify-between">
                                                 <div className="flex gap-2">
                                                     <span className="flex h-9 w-[36px] max-w-[36px] items-center justify-center rounded-full bg-[#004B94] dark:bg-[#233e77] text-white">
                                                         <TbSubtask size={20} />
                                                     </span>
-                                                    <h5 onClick={() => { setTaskDetailsPopup(true), setTaskIdForDetails(tasks._id) }} className="text-lg font-medium text-gray-800 dark:text-white cursor-pointer mt-1">
-                                                        {tasks?.taskName}
+                                                    <h5 onClick={() => { setTaskDetailsPopup(true), setTaskIdForDetails(task._id) }} className="text-lg font-medium text-gray-800 dark:text-white cursor-pointer mt-1">
+                                                        {task?.taskName}
                                                     </h5>
                                                 </div>
                                                 <div>
-                                                    <span className="cursor-pointer" onClick={() => toggleOverlay(tasks._id)}>
+                                                    <span className="cursor-pointer" onClick={() => toggleOverlay(task._id)}>
                                                         <BsThreeDots size={22} />
                                                     </span>
                                                 </div>
@@ -409,23 +409,23 @@ const TaskLists = () => {
                                                         <span>{status}</span>
                                                     </p>
                                                     <p className="text-xs font-medium text-gray-600 dark:text-gray-100">
-                                                        {todoLengthProgress?._id === tasks?._id && todoLengthProgress?.todoList
+                                                        {todoLengthProgress?._id === task?._id && todoLengthProgress?.todoList
                                                             ? `${todoLengthProgress.todoList.filter((todo: { workDone: boolean }) => todo.workDone).length}/${todoLengthProgress.todoList.length}`
-                                                            : tasks?.todoList
-                                                                ? `${tasks.todoList.filter((task: { workDone: boolean }) => task.workDone).length}/${tasks.todoList.length}`
+                                                            : task?.todoList
+                                                                ? `${task.todoList.filter((task: { workDone: boolean }) => task.workDone).length}/${task.todoList.length}`
                                                                 : "0/0"}
                                                     </p>
                                                 </div>
                                                 <ProgressBar
                                                     className="text-xs bg-white dark:bg-gray-200 h-3"
                                                     value={Math.round(
-                                                        ((todoLengthProgress?.todoList && todoLengthProgress?._id === tasks?._id
+                                                        ((todoLengthProgress?.todoList && todoLengthProgress?._id === task?._id
                                                             ? todoLengthProgress.todoList.filter((todo: { workDone: boolean }) => todo.workDone).length
-                                                            : tasks?.todoList?.filter((task: { workDone: boolean }) => task.workDone).length || 0
+                                                            : task?.todoList?.filter((task: { workDone: boolean }) => task.workDone).length || 0
                                                         ) /
-                                                            ((todoLengthProgress?.todoList && todoLengthProgress?._id === tasks?._id
+                                                            ((todoLengthProgress?.todoList && todoLengthProgress?._id === task?._id
                                                                 ? todoLengthProgress.todoList.length
-                                                                : tasks?.todoList?.length) || 1)) * 100
+                                                                : task?.todoList?.length) || 1)) * 100
                                                     )}
                                                 >
                                                 </ProgressBar>
@@ -433,21 +433,21 @@ const TaskLists = () => {
                                             </div>
 
                                             <div className="flex flex-wrap gap-2">
-                                                {tasks?.taskCategory?.map((taskCtg: any, index: number) => (
-                                                    <span key={`${tasks?._id}-${index}`} className="inline-block rounded-lg px-3 py-2 bg-[#9C82F8] text-xs font-medium text-white">
+                                                {task?.taskCategory?.map((taskCtg: any, index: number) => (
+                                                    <span key={`${task?._id}-${index}`} className="inline-block rounded-lg px-3 py-2 bg-[#9C82F8] text-xs font-medium text-white">
                                                         {taskCtg}
                                                     </span>
                                                 ))}
                                             </div>
 
-                                            <div className={`bg-gray-50 dark:bg-[#323232] absolute right-4 top-12 px-4 pt-3 pb-4 rounded-md shadow transition-opacity duration-300 overly-panel ${activeOverlay === tasks._id ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
-                                                <span onClick={() => { setTaskDetailsPopup(true), setTaskIdForDetails(tasks._id) }} className="text-gray-800 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 duration-300 cursor-pointer block">
+                                            <div className={`bg-gray-50 dark:bg-[#323232] absolute right-4 top-12 px-4 pt-3 pb-4 rounded-md shadow transition-opacity duration-300 overly-panel ${activeOverlay === task._id ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
+                                                <span onClick={() => { setTaskDetailsPopup(true), setTaskIdForDetails(task._id) }} className="text-gray-800 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 duration-300 cursor-pointer block">
                                                     <FaEye size={20} />
                                                 </span>
-                                                <span onClick={() => handleEditClick(tasks)} className="text-gray-800 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 duration-300 cursor-pointer block mt-3 mb-4">
+                                                <span onClick={() => handleEditClick(task)} className="text-gray-800 dark:text-white hover:text-blue-500 dark:hover:text-blue-400 duration-300 cursor-pointer block mt-3 mb-4">
                                                     <FiEdit3 size={20} />
                                                 </span>
-                                                <Button onClick={() => handleDeleteTodo(tasks?._id)} className={`text-gray-800 dark:text-white hover:text-red-500 dark:hover:text-red-500 duration-300 cursor-pointer focus:shadow-none block ${isDeleteIconLoading && 'cursor-wait opacity-50'}`} disabled={isDeleteIconLoading}>
+                                                <Button onClick={() => handleDeleteTodo(task?._id)} className={`text-gray-800 dark:text-white hover:text-red-500 dark:hover:text-red-500 duration-300 cursor-pointer focus:shadow-none block ${isDeleteIconLoading && 'cursor-wait opacity-50'}`} disabled={isDeleteIconLoading}>
                                                     <FiTrash2 size={20} />
                                                 </Button>
                                             </div>
