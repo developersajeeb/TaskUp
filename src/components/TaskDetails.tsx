@@ -11,15 +11,14 @@ import { FiTrash2 } from 'react-icons/fi';
 import { LuListTree } from 'react-icons/lu';
 import { toast } from 'react-toastify';
 import DeletePopup from './DeletePoup';
-import {fetchTaskDetails } from '@/services/task';
+import { fetchTaskDetails } from '@/services/task';
 import { addTodo, deleteTodo, updateTodoStatus } from '@/services/todo';
 
 interface Props {
     taskDetailsPopup: boolean;
     setTaskDetailsPopup: (value: boolean) => void;
     taskIdForDetails: string | null;
-    todoLengthProgress: TaskDetailsProps | null;
-    setTodoLengthProgress: (value: TaskDetailsProps | null) => void;
+    onUpdate: (updatedTask: TaskDetailsProps) => void;
 }
 
 interface TodoItem {
@@ -40,35 +39,36 @@ interface TaskDetailsProps {
 interface TodoListContent {
     todoListDetails: string;
 }
-const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails, todoLengthProgress, setTodoLengthProgress }: Props) => {
+const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails, onUpdate }: Props) => {
     const [isDataLoading, setDataLoading] = useState<boolean>(true);
     const [isFormBtnLoading, setIsFormBtnLoading] = useState<boolean>(false);
     const [addTodoList, setAddTodoList] = useState<boolean>(false);
     const [deletePopup, setDeletePopup] = useState<boolean>(false);
     const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
-    
+    const [taskDetails, setTaskDetails] = useState<TaskDetailsProps>()
+
     const fetchTasksDetails = async () => {
         if (!taskIdForDetails) return;
         setDataLoading(true);
-    
+
         try {
             const data = await fetchTaskDetails(taskIdForDetails);
-            setTodoLengthProgress(data);
+            setTaskDetails(data);
         } catch (error) {
             console.error("Error fetching task:", error);
         } finally {
             setDataLoading(false);
         }
-    };  
+    };
     useEffect(() => {
         fetchTasksDetails();
     }, [taskIdForDetails, taskDetailsPopup]);
 
     const customHeader = () => {
         return (
-            <p>{todoLengthProgress?.taskName || '---'}
-                {todoLengthProgress?.priority !== null &&
-                    <span className={`text-white font-medium text-xs ml-2 py-1 px-2 rounded-lg ${todoLengthProgress?.priority === 'Low' && 'bg-gray-400' || todoLengthProgress?.priority === 'Medium' && 'bg-yellow-500' || todoLengthProgress?.priority === 'High' && 'bg-red-500'}`}>{todoLengthProgress?.priority}</span>
+            <p>{taskDetails?.taskName || '---'}
+                {taskDetails?.priority !== null &&
+                    <span className={`text-white font-medium text-xs ml-2 py-1 px-2 rounded-lg ${taskDetails?.priority === 'Low' && 'bg-gray-400' || taskDetails?.priority === 'Medium' && 'bg-yellow-500' || taskDetails?.priority === 'High' && 'bg-red-500'}`}>{taskDetails?.priority}</span>
                 }
             </p>
         )
@@ -103,7 +103,7 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails, 
         } finally {
             setIsFormBtnLoading(false);
         }
-    };    
+    };
 
     const handleCheckboxClick = async (index: number, checked: boolean) => {
         setDataLoading(true);
@@ -111,8 +111,10 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails, 
         try {
             const success = await updateTodoStatus(taskIdForDetails, index, checked);
             if (success) {
+                const updatedTask = await fetchTaskDetails(taskIdForDetails);
+                onUpdate(updatedTask);
+                setTaskDetails(updatedTask);
                 toast.success("Todo status updated successfully!");
-                await fetchTasksDetails();
             } else {
                 toast.error("Failed to update todo status.");
             }
@@ -121,7 +123,7 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails, 
         } finally {
             setDataLoading(false);
         }
-    };    
+    };
 
     const handleDeleteTodo = (index: number) => {
         setDeleteIndex(index);
@@ -158,17 +160,17 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails, 
                 </div>
             }>
                 <div className='pt-6 overflow-hidden'>
-                    {todoLengthProgress?.description ? (
+                    {taskDetails?.description ? (
                         <>
                             <h5 className='text-gray-800 dark:text-white font-medium mb-2'>Description:</h5>
-                            <p className='text-gray-800 dark:text-gray-200 text-sm'>{todoLengthProgress?.description}</p>
+                            <p className='text-gray-800 dark:text-gray-200 text-sm'>{taskDetails?.description}</p>
                         </>
                     ) : (
                         <p className='text-gray-600 dark:text-gray-200 text-center'>No description here!</p>
                     )}
 
-                    {todoLengthProgress?.dueDate && (
-                        <p className='text-gray-800 dark:text-white text-sm mt-4'> <span className='font-semibold text-red-500'>Due Date:</span> {new Date(todoLengthProgress.dueDate).toLocaleDateString('en-US', {
+                    {taskDetails?.dueDate && (
+                        <p className='text-gray-800 dark:text-white text-sm mt-4'> <span className='font-semibold text-red-500'>Due Date:</span> {new Date(taskDetails.dueDate).toLocaleDateString('en-US', {
                             weekday: 'long',
                             year: 'numeric',
                             month: 'long',
@@ -176,10 +178,10 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails, 
                         })}</p>
                     )}
 
-                    {todoLengthProgress?.taskCategory && todoLengthProgress?.taskCategory?.length > 0 && (
+                    {taskDetails?.taskCategory && taskDetails?.taskCategory?.length > 0 && (
                         <div className="flex flex-wrap gap-2 mt-8">
-                            {todoLengthProgress?.taskCategory?.map((taskCtg: any, index: number) => (
-                                <span key={`${todoLengthProgress?._id}-${index}`} className="inline-block rounded-lg px-3 py-2 bg-[#9C82F8] text-xs font-medium text-white">
+                            {taskDetails?.taskCategory?.map((taskCtg: any, index: number) => (
+                                <span key={`${taskDetails?._id}-${index}`} className="inline-block rounded-lg px-3 py-2 bg-[#9C82F8] text-xs font-medium text-white">
                                     {taskCtg}
                                 </span>
                             ))}
@@ -191,8 +193,8 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails, 
                     <button className='primary-btn flex items-center gap-2' onClick={() => setAddTodoList(true)}>Add Todo List <LuListTree size={16} /></button>
 
                     <ul className='grid gap-5 mt-10'>
-                        {todoLengthProgress?.todoList && todoLengthProgress.todoList.length > 0 ? (
-                            todoLengthProgress.todoList.map((todo: any, index: number) => (
+                        {taskDetails?.todoList && taskDetails.todoList.length > 0 ? (
+                            taskDetails.todoList.map((todo: any, index: number) => (
                                 <li key={index} className={`flex flex-col md:flex-row gap-3 bg-gray-100 dark:bg-[#303030] p-4 md:p-5 rounded-lg border-2 border-gray-200 dark:border-[#484848] relative ${todo.workDone ? 'line-through opacity-50' : ''}`}>
                                     <Checkbox
                                         onChange={e => handleCheckboxClick(index, e.checked ?? false)}

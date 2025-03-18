@@ -2,7 +2,7 @@ import React, { Suspense } from 'react';
 import TotalTaskGraph from './TotalTask';
 import TaskNumberOverview from './TaskNumberOverview';
 import { Skeleton } from 'primereact/skeleton';
-import WeeklyAnalytics from './WeeklyAnalytics';
+import ShortTaskTable from '@/components/ShortTaskTable';
 
 export const metadata = {
     title: "Dashboard - TaskUp",
@@ -23,7 +23,7 @@ const Dashboard = async () => {
 
             <section className='mt-8'>
                 <Suspense fallback={<Skeleton width="100%" height="180px" className='dark:bg-[#1a1a1a] rounded-xl'></Skeleton>}>
-                    <WeeklyAnalytics />
+                    <ShortTaskTable />
                 </Suspense>
             </section>
         </>

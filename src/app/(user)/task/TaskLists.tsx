@@ -62,7 +62,6 @@ const TaskLists = () => {
         isOpen: false,
         task: null,
     });
-    const [todoLengthProgress, setTodoLengthProgress] = useState<TaskDetailsProps | null>(null);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const { register, handleSubmit, watch } = useForm();
     const [first, setFirst] = useState<number>(0);
@@ -86,7 +85,6 @@ const TaskLists = () => {
 
         const searchQuery = watch('searchQuery') || '';
         const priority = selectedPriority?.name || '';
-        console.log(priority);
 
         try {
             const queryParams = new URLSearchParams({
@@ -325,10 +323,7 @@ const TaskLists = () => {
                                             header="Status"
                                             className="tu-table-column w-[130px]"
                                             body={(item: TaskDetailsProps) => {
-                                                const isCurrentTask = todoLengthProgress?._id === item._id;
-                                                const isCompleted = isCurrentTask
-                                                    ? todoLengthProgress?.todoList?.every(todo => todo.workDone)
-                                                    : item?.todoList?.every(todo => todo.workDone);
+                                                const isCompleted = item?.todoList?.every(todo => todo.workDone);
 
                                                 const status = isCompleted ? "Completed" : "In Progress";
 
@@ -373,10 +368,7 @@ const TaskLists = () => {
                         <BlockUI className="!bg-[#ffffffca] dark:!bg-[#121212e8] w-full !h-[calc(100vh-162px)] !z-[60]" blocked={isDataLoading} template={<CommonLoader />}>
                             <section className="grid md:grid-cols-2 xl:grid-cols-3 gap-5 xl:gap-7 mt-10">
                                 {allTasks?.map((task: any) => {
-                                    const isCurrentTask = todoLengthProgress?._id === task._id;
-                                    const isCompleted = isCurrentTask
-                                        ? todoLengthProgress?.todoList?.every(todo => todo.workDone)
-                                        : task?.todoList?.every((todo: { workDone: boolean; }) => todo.workDone);
+                                    const isCompleted = task?.todoList?.every((todo: { workDone: boolean; }) => todo.workDone);
                                     const status = isCompleted ? "Completed" : "In Progress";
 
                                     return (
@@ -409,23 +401,17 @@ const TaskLists = () => {
                                                         <span>{status}</span>
                                                     </p>
                                                     <p className="text-xs font-medium text-gray-600 dark:text-gray-100">
-                                                        {todoLengthProgress?._id === task?._id && todoLengthProgress?.todoList
-                                                            ? `${todoLengthProgress.todoList.filter((todo: { workDone: boolean }) => todo.workDone).length}/${todoLengthProgress.todoList.length}`
-                                                            : task?.todoList
-                                                                ? `${task.todoList.filter((task: { workDone: boolean }) => task.workDone).length}/${task.todoList.length}`
-                                                                : "0/0"}
+                                                        {task?.todoList
+                                                            ? `${task.todoList.filter((task: { workDone: boolean }) => task.workDone).length}/${task.todoList.length}`
+                                                            : "0/0"}
                                                     </p>
                                                 </div>
                                                 <ProgressBar
                                                     className="text-xs bg-white dark:bg-gray-200 h-3"
                                                     value={Math.round(
-                                                        ((todoLengthProgress?.todoList && todoLengthProgress?._id === task?._id
-                                                            ? todoLengthProgress.todoList.filter((todo: { workDone: boolean }) => todo.workDone).length
-                                                            : task?.todoList?.filter((task: { workDone: boolean }) => task.workDone).length || 0
+                                                        ((task?.todoList?.filter((task: { workDone: boolean }) => task.workDone).length || 0
                                                         ) /
-                                                            ((todoLengthProgress?.todoList && todoLengthProgress?._id === task?._id
-                                                                ? todoLengthProgress.todoList.length
-                                                                : task?.todoList?.length) || 1)) * 100
+                                                            ((task?.todoList?.length) || 1)) * 100
                                                     )}
                                                 >
                                                 </ProgressBar>
@@ -461,7 +447,12 @@ const TaskLists = () => {
             )}
 
             <DeletePopup deletePopup={deletePopup} setDeletePopup={setDeletePopup} onDelete={onConfirmDeleteTodo} deleteBtnLoading={isDeleteIconLoading} />
-            <TaskDetails taskDetailsPopup={taskDetailsPopup} setTaskDetailsPopup={setTaskDetailsPopup} taskIdForDetails={taskIdForDetails} todoLengthProgress={todoLengthProgress} setTodoLengthProgress={setTodoLengthProgress} />
+            <TaskDetails taskDetailsPopup={taskDetailsPopup} setTaskDetailsPopup={setTaskDetailsPopup} taskIdForDetails={taskIdForDetails}
+                onUpdate={(updatedTask) => {
+                    setAllTasks(prevTasks => prevTasks.map(task =>
+                        task._id === updatedTask._id ? updatedTask : task
+                    ));
+                }} />
             <AddTaskPopup taskAddForm={taskAddForm} setTaskAddForm={setTaskAddForm} fetchTasks={fetchUserTasks} />
             <EditTaskPopup taskEditForm={taskEditForm.isOpen} setTaskEditForm={(isOpen) => setTaskEditForm({ isOpen, task: null })} fetchUserTasks={fetchUserTasks} task={taskEditForm.task} />
         </>
