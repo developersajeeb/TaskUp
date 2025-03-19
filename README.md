@@ -16,7 +16,7 @@ TaskUp is a personal task management software designed to help users organize th
 
 - **Task Management**
   - Dashboard displaying total tasks, completed, and incomplete tasks
-  - Interactive charts (Total Chart & Weekly Chart)
+  - Interactive charts (Total Chart)
   - Add, edit, and delete tasks with the following details:
     - Task Name
     - Description
