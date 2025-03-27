@@ -94,7 +94,9 @@ const TaskDetails = ({ taskDetailsPopup, setTaskDetailsPopup, taskIdForDetails, 
                 toast.success("Todo added successfully!");
                 setAddTodoList(false);
                 reset();
-                await fetchTasksDetails();
+                const updatedTask = await fetchTaskDetails(taskIdForDetails);
+                onUpdate(updatedTask);
+                setTaskDetails(updatedTask);
             } else {
                 toast.error("Failed to add todo.");
             }
