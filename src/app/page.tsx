@@ -15,7 +15,7 @@ const Home = () => {
   }, [session?.status, router]);
 
   if (session?.status === "loading") {
-    return <CommonLoader />;
+    return <div className="bg-[#ffffffca] dark:bg-[#121212e8] w-full h-screen z-[60]"><CommonLoader /></div>;
   }
 
   return <></>;
